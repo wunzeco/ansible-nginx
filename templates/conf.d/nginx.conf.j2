@@ -12,8 +12,8 @@ pid        {{ nginx_pid_file }};
 error_log  {{ nginx_nginx_error_log }};
 
 {% if nginx_nginx_cfg_prepend -%}
-{% set field_width = nginx_nginx_cf_prepend.keys()|map('length')|max %}
-{% for key,value in nginx_nginx_cf_prepend|dictsort %}
+{% set field_width = nginx_nginx_cfg_prepend.keys()|map('length')|max %}
+{% for key,value in nginx_nginx_cfg_prepend|dictsort %}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
 {{ key.ljust(field_width) }} {{ asubvalue }};

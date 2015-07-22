@@ -12,7 +12,7 @@ nginx_global_owner:           'root'
 nginx_global_group:           "{{ nginx_root_group }}"
 nginx_global_mode:            '0644'
 nginx_http_access_log:        "{{ nginx_log_dir }}/access.log"
-nginx_manage_repo:            false
+nginx_manage_repo:            true
 nginx_nginx_error_log:        "{{ nginx_log_dir }}/error.log"
 nginx_root_group:             root
 nginx_package_name:           nginx
@@ -83,7 +83,6 @@ nginx_package_ensure:                   present,
 nginx_package_name:                     $::nginx::params::package_name,
 nginx_package_source:                   'nginx',
 nginx_package_flavor:
-nginx_manage_repo:                      $::nginx::params::manage_repo,
 ### END Package Configuration ###
 
 ### START Service Configuation ###
