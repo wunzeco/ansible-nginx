@@ -1,0 +1,73 @@
+---
+
+### CONFIGURATION ###
+- name: Create nginx conf directory
+  file: path={{ nginx_conf_dir }} owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Delete nginx conf directory
+  file: path={{ nginx_conf_dir }}/conf.d state=absent
+  when: nginx_confd_purge
+  notify: Restart nginx
+
+- name: Create nginx conf.d directory
+  file: path={{ nginx_conf_dir }}/conf.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Delete nginx mail conf directory
+  file: path={{ nginx_conf_dir }}/conf.mail.d state=absent
+  when: nginx_confd_purge
+
+- name: Create nginx conf.d directory
+  file: path={{ nginx_conf_dir }}/conf.mail.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Delete nginx vhost_autogen.conf file in conf.d
+  file: path={{ nginx_conf_dir }}/conf.d/vhost_autogen.conf state=absent
+
+- name: Delete nginx vhost_autogen.conf file in conf.mail.d
+  file: path={{ nginx_conf_dir }}/conf.mail.d/vhost_autogen.conf state=absent
+
+- name: Create nginx run directory
+  file: path={{ nginx_run_dir }} owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Create nginx log directory
+  file: path={{ nginx_log_dir }} owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Create nginx client body temp path
+  file: path={{ nginx_client_body_temp_path }} owner={{ nginx_daemon_user }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Create nginx proxy temp path
+  file: path={{ nginx_proxy_temp_path }} owner={{ nginx_daemon_user }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Delete nginx sites-available directory
+  file: path={{ nginx_conf_dir }}/sites-available state=absent
+  when: nginx_vhost_purge
+
+- name: Create nginx sites-available directory
+  file: path={{ nginx_conf_dir }}/sites-available owner={{ nginx_sites_available_owner }} group={{ nginx_sites_available_group }} mode=0755 state=directory
+
+- name: Delete nginx sites-enabled directory
+  file: path={{ nginx_conf_dir }}/sites-enabled state=absent
+  when: nginx_vhost_purge
+
+- name: Create nginx sites-enabled directory
+  file: path={{ nginx_conf_dir }}/sites-enabled owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+
+- name: Disable nginx default vhost
+  file: path={{ nginx_conf_dir }}/sites-enabled/default state=absent
+
+- name: Create nginx conf file
+  template: src={{ nginx_conf_template }} dest={{ nginx_conf_dir }}/nginx.conf owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0644 state=present
+
+- name: Delete nginx proxy.conf file in conf.d
+  file: path={{ nginx_conf_dir }}/conf.d/proxy.conf state=absent
+
+- name: Delete nginx default.conf file in conf.d
+  file: path={{ nginx_conf_dir }}/conf.d/default.conf state=absent
+
+- name: Delete nginx example_ssl.conf file in conf.d
+  file: path={{ nginx_conf_dir }}/conf.d/example_ssl.conf state=absent
+
+- name: Delete nginx temp directory
+  file: path={{ nginx_temp_dir }}/nginx.d state=absent
+
+- name: Delete nginx mail temp directory
+  file: path={{ nginx_temp_dir }}/nginx.mail.d state=absent
