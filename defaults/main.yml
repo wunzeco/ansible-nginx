@@ -21,61 +21,74 @@ nginx_sites_available_owner:  'root'
 nginx_sites_available_group:  "{{ nginx_root_group }}"
 nginx_sites_available_mode:   '0644'
 nginx_super_user:             true
-nginx_confd_purge:
+nginx_confd_purge:            false
 nginx_log_format:
-nginx_vhost_purge:
+nginx_vhost_purge:            false
 
 
 ### START Nginx Configuration ###
-nginx_client_body_buffer_size:
-nginx_client_body_temp_path:
-nginx_client_max_body_size:
-nginx_events_use:
-nginx_fastcgi_cache_inactive:
-nginx_fastcgi_cache_key:
-nginx_fastcgi_cache_keys_zone:
-nginx_fastcgi_cache_levels:
-nginx_fastcgi_cache_max_size:
-nginx_fastcgi_cache_path:
-nginx_fastcgi_cache_use_stale:
-nginx_gzip:
-nginx_http_cfg_append:
-nginx_http_tcp_nodelay:
-nginx_http_tcp_nopush:
-nginx_keepalive_timeout:
-nginx_mail:
-nginx_multi_accept:
-nginx_names_hash_bucket_size:
-nginx_names_hash_max_size:
-nginx_proxy_buffers:
-nginx_proxy_buffer_size:
-nginx_proxy_cache_inactive:
-nginx_proxy_cache_keys_zone:
-nginx_proxy_cache_levels:
-nginx_proxy_cache_max_size:
-nginx_proxy_cache_path:
-nginx_proxy_connect_timeout:
-nginx_proxy_headers_hash_bucket_size:
-nginx_proxy_http_version:
-nginx_proxy_read_timeout:
-nginx_proxy_redirect:
-nginx_proxy_send_timeout:
+nginx_client_body_buffer_size:         '128k'
+nginx_client_max_body_size:            '10m'
+nginx_events_use:                      false
+nginx_fastcgi_cache_inactive:          '20m'
+nginx_fastcgi_cache_key:               false
+nginx_fastcgi_cache_keys_zone:         'd3:100m'
+nginx_fastcgi_cache_levels:            '1'
+nginx_fastcgi_cache_max_size:          '500m'
+nginx_fastcgi_cache_path:              false
+nginx_fastcgi_cache_use_stale:         false
+nginx_gzip:                            'on'
+nginx_gzip_buffers:                    undef
+nginx_gzip_comp_level:                 1
+nginx_gzip_disable:                    'msie6'
+nginx_gzip_min_length:                 20
+nginx_gzip_http_version:               1.1
+nginx_gzip_proxied:                    'off'
+nginx_gzip_types:                      'text/html'
+nginx_gzip_vary:                       'off'
+nginx_http_cfg_append:                 false
+nginx_http_tcp_nodelay:                'on'
+nginx_http_tcp_nopush:                 'off'
+nginx_keepalive_timeout:               '65'
+nginx_log_format:                      {}
+nginx_mail:                            false
+nginx_multi_accept:                    'off'
+nginx_names_hash_bucket_size:          '64'
+nginx_names_hash_max_size:             '512'
+nginx_nginx_cfg_prepend:               false
+nginx_proxy_buffers:                   '32 4k'
+nginx_proxy_buffer_size:               '8k'
+nginx_proxy_cache_inactive:            '20m'
+nginx_proxy_cache_keys_zone:           'd2:100m'
+nginx_proxy_cache_levels:              '1'
+nginx_proxy_cache_max_size:            '500m'
+nginx_proxy_cache_path:                false
+nginx_proxy_connect_timeout:           '90'
+nginx_proxy_headers_hash_bucket_size:  '64'
+nginx_proxy_http_version:              undef
+nginx_proxy_read_timeout:              '90'
+nginx_proxy_redirect:                  'off'
+nginx_proxy_send_timeout:              '90'
 nginx_proxy_set_header:
-nginx_sendfile:
-nginx_server_tokens:
-nginx_spdy:
-nginx_types_hash_bucket_size:
-nginx_types_hash_max_size:
-nginx_worker_connections:
-nginx_worker_processes:
-nginx_worker_rlimit_nofile:
-### END Nginx Configuration
+  - 'Host $host'
+  - 'X-Real-IP $remote_addr'
+  - 'X-Forwarded-For $proxy_add_x_forwarded_for'
+nginx_sendfile:                        'on'
+nginx_server_tokens:                   'on'
+nginx_spdy:                            'off'
+nginx_ssl_stapling:                    'off'
+nginx_types_hash_bucket_size:          '512'
+nginx_types_hash_max_size:             '1024'
+nginx_worker_connections:              '1024'
+nginx_worker_processes:                '1'
+nginx_worker_rlimit_nofile:            '1024'
+### END Nginx Configuration ###
 
 ### START Module/App Configuration ###
 
 # Primary Templates
-nginx_conf_template:
-nginx_proxy_conf_template:
+nginx_conf_template:                    'conf.d/nginx.conf.j2'
+nginx_proxy_conf_template:              'conf.d/nginx.conf.j2'
 ### END Module/App Configuration ###
 
 ### START Package Configuration ###
