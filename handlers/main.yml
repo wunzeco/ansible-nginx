@@ -1,0 +1,8 @@
+---
+
+- name: Validate nginx config
+  shell: /etc/init.d/nginx configtest
+  when: nginx_configtest_enable
+  
+- name: Restart nginx
+  service: name={{ nginx_service_name }} state=restarted

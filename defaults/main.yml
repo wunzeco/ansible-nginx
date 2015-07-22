@@ -7,7 +7,7 @@ nginx_temp_dir:               /tmp
 nginx_pid_file:               /var/run/nginx.pid
 
 nginx_client_body_temp_path:  "{{ nginx_run_dir }}/client_body_temp"
-nginx_user:                   nginx
+nginx_daemon_user:            nginx
 nginx_global_owner:           'root'
 nginx_global_group:           "{{ nginx_root_group }}"
 nginx_global_mode:            '0644'

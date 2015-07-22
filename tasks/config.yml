@@ -9,7 +9,9 @@
 - name: Delete nginx conf directory
   file: path={{ nginx_conf_dir }}/conf.d state=absent
   when: nginx_confd_purge
-  notify: Restart nginx
+  notify: 
+    - Validate nginx config
+    - Restart nginx
 
 - name: Create nginx conf.d directory
   file: path={{ nginx_conf_dir }}/conf.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
@@ -58,6 +60,9 @@
 
 - name: Create nginx conf file
   template: src={{ nginx_conf_template }} dest={{ nginx_conf_dir }}/nginx.conf owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0644 state=present
+  notify: 
+    - Validate nginx config
+    - Restart nginx
 
 - name: Delete nginx proxy.conf file in conf.d
   file: path={{ nginx_conf_dir }}/conf.d/proxy.conf state=absent
