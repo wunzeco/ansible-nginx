@@ -1,0 +1,104 @@
+---
+### START Module/App Configuration ###
+nginx_conf_dir:               /etc/nginx
+nginx_log_dir:                /var/log/nginx
+nginx_run_dir:                /var/nginx
+nginx_temp_dir:               /tmp
+nginx_pid_file:               /var/run/nginx.pid
+
+nginx_client_body_temp_path:  "{{ nginx_run_dir }}/client_body_temp"
+nginx_user:                   nginx
+nginx_global_owner:           'root'
+nginx_global_group:           "{{ nginx_root_group }}"
+nginx_global_mode:            '0644'
+nginx_http_access_log:        "{{ nginx_log_dir }}/access.log"
+nginx_manage_repo:            false
+nginx_nginx_error_log:        "{{ nginx_log_dir }}/error.log"
+nginx_root_group:             root
+nginx_package_name:           nginx
+nginx_proxy_temp_path:        "{{ nginx_run_dir }}/proxy_temp"
+nginx_sites_available_owner:  'root'
+nginx_sites_available_group:  "{{ nginx_root_group }}"
+nginx_sites_available_mode:   '0644'
+nginx_super_user:             true
+nginx_confd_purge:
+nginx_log_format:
+nginx_vhost_purge:
+
+
+### START Nginx Configuration ###
+nginx_client_body_buffer_size:
+nginx_client_body_temp_path:
+nginx_client_max_body_size:
+nginx_events_use:
+nginx_fastcgi_cache_inactive:
+nginx_fastcgi_cache_key:
+nginx_fastcgi_cache_keys_zone:
+nginx_fastcgi_cache_levels:
+nginx_fastcgi_cache_max_size:
+nginx_fastcgi_cache_path:
+nginx_fastcgi_cache_use_stale:
+nginx_gzip:
+nginx_http_cfg_append:
+nginx_http_tcp_nodelay:
+nginx_http_tcp_nopush:
+nginx_keepalive_timeout:
+nginx_mail:
+nginx_multi_accept:
+nginx_names_hash_bucket_size:
+nginx_names_hash_max_size:
+nginx_proxy_buffers:
+nginx_proxy_buffer_size:
+nginx_proxy_cache_inactive:
+nginx_proxy_cache_keys_zone:
+nginx_proxy_cache_levels:
+nginx_proxy_cache_max_size:
+nginx_proxy_cache_path:
+nginx_proxy_connect_timeout:
+nginx_proxy_headers_hash_bucket_size:
+nginx_proxy_http_version:
+nginx_proxy_read_timeout:
+nginx_proxy_redirect:
+nginx_proxy_send_timeout:
+nginx_proxy_set_header:
+nginx_sendfile:
+nginx_server_tokens:
+nginx_spdy:
+nginx_types_hash_bucket_size:
+nginx_types_hash_max_size:
+nginx_worker_connections:
+nginx_worker_processes:
+nginx_worker_rlimit_nofile:
+### END Nginx Configuration
+
+### START Module/App Configuration ###
+
+# Primary Templates
+nginx_conf_template:
+nginx_proxy_conf_template:
+### END Module/App Configuration ###
+
+### START Package Configuration ###
+nginx_package_ensure:                   present,
+nginx_package_name:                     $::nginx::params::package_name,
+nginx_package_source:                   'nginx',
+nginx_package_flavor:
+nginx_manage_repo:                      $::nginx::params::manage_repo,
+### END Package Configuration ###
+
+### START Service Configuation ###
+nginx_configtest_enable:                false,
+nginx_service_ensure:                   running,
+nginx_service_flags:
+nginx_service_restart:                  '/etc/init.d/nginx configtest && /etc/init.d/nginx restart',
+nginx_service_name:
+### END Service Configuration ###
+
+### START Hiera Lookups ###
+nginx_geo_mappings:                     {},
+nginx_string_mappings:                  {},
+nginx_nginx_locations:                  {},
+nginx_nginx_mailhosts:                  {},
+nginx_nginx_upstreams:                  {},
+nginx_nginx_vhosts:                     {},
+nginx_nginx_vhosts_defaults:            {},

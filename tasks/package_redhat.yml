@@ -1,0 +1,10 @@
+---
+- set_fact: _os=rhel
+  when: ansible_distribution|lower != 'centos'
+
+- name: Configure nginx yum repo
+  template: src=nginx.yum.repo.j2 dest=/etc/yum.repos.d/nginx.repo state=present
+  when: nginx_manage_repo
+
+- name: Install nginx package
+  yum: name={{ nginx_package_name }} update_cache=yes state=present

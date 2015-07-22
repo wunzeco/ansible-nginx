@@ -1,0 +1,38 @@
+---
+
+- name: Add phusion passenger repo apt key
+  apt_key: keyserver=keyserver.ubuntu.com id=16378A33A6EF16762922526E561F9B9CAC40B2F7
+  when: nginx_manage_repo and nginx_package_source == 'passenger'
+
+- name: Add phusion passenger repo to sources list
+  apt_repository: repo="deb {{ nginx_passenger_repo }}" state=present
+  when: nginx_manage_repo and nginx_package_source == 'passenger'
+
+- name: Add nginx repo apt key
+  apt_key: keyserver=keyserver.ubuntu.com id=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
+  when: nginx_manage_repo and nginx_package_source|match('nginx|nginx-stable|nginx-mainline')
+
+- name: Add nginx repo to sources list
+  apt_repository: repo="deb {{ nginx_repo }}" state=present
+  when: nginx_manage_repo and nginx_package_source|match('nginx|nginx-stable')
+
+- name: Add nginx mainline repo to sources list
+  apt_repository: repo="deb {{ nginx_mainline_repo }}" state=present
+  when: nginx_manage_repo and nginx_package_source == 'nginx-mainline'
+
+- name: Update apt cache
+  apt: update_cache=yes cache_valid_time=1800
+
+- name: Install phusion passenger prerequisites
+  apt: name={{ item }} state=present
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+  when: nginx_manage_repo and nginx_package_source == 'passenger'
+
+- name: Install phusion passenger 
+  apt: name=passenger state=present
+  when: nginx_manage_repo and nginx_package_source == 'passenger'
+
+- name: Install nginx package
+  apt: name={{ nginx_package_name }} state=present

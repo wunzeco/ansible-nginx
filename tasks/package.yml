@@ -1,0 +1,3 @@
+---
+
+- include: "package_{{ ansible_os_family|lower }}.yml"
