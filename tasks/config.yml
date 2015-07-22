@@ -1,6 +1,8 @@
 ---
 
 ### CONFIGURATION ###
+#- include: validate_config_params.yml
+
 - name: Create nginx conf directory
   file: path={{ nginx_conf_dir }} owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
 
