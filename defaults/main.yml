@@ -99,11 +99,12 @@ nginx_package_flavor:
 ### END Package Configuration ###
 
 ### START Service Configuation ###
-nginx_configtest_enable:                false,
-nginx_service_ensure:                   running,
+nginx_configtest_enable:                false
+nginx_service_ensure:                   started
+nginx_service_enable:                   true
 nginx_service_flags:
-nginx_service_restart:                  '/etc/init.d/nginx configtest && /etc/init.d/nginx restart',
-nginx_service_name:
+nginx_service_restart:                  '/etc/init.d/nginx configtest && /etc/init.d/nginx restart'
+nginx_service_name:                     nginx
 ### END Service Configuration ###
 
 ### START Hiera Lookups ###
