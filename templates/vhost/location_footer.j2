@@ -23,7 +23,7 @@
 {% endif %}
 {% endfor %}
 {% endif -%}
-{% if nginx_raw_append and nginx_raw_append|default([])|count > 0 %}
+{% if nginx_raw_append is not defined and nginx_raw_append|default([])|count > 0 %}
 {% for line in nginx_raw_append %}
     {{ line }}
 {% endfor %}
