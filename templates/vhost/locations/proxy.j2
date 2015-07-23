@@ -1,0 +1,29 @@
+    proxy_pass            {{ nginx_proxy }};
+    proxy_read_timeout    {{ nginx_proxy_read_timeout }};
+    proxy_connect_timeout {{ nginx_proxy_connect_timeout }};
+    proxy_redirect        {{ nginx_proxy_redirect }};
+{% if nginx_proxy_method -%}
+    proxy_method          {{ nginx_proxy_method }};
+{% endif -%}
+{% if nginx_proxy_set_body -%}
+    proxy_set_body        {{ nginx_proxy_set_body }};
+{% endif -%}
+{% if nginx_proxy_set_header|default([])|count > 0 -%}
+
+{% for header in nginx_proxy_set_header -%}
+    proxy_set_header      {{ header }};
+{% endfor -%}
+
+{% end -%}
+{% if nginx_proxy_cache -%}
+    proxy_cache           {{ nginx_proxy_cache }};
+{% endif -%}
+{% if nginx_proxy_cache_valid -%}
+    proxy_cache_valid     {{ nginx_proxy_cache_valid }};
+{% endif -%}
+{% if nginx_proxy_cache_use_stale -%}
+    proxy_cache_use_stale   {{ nginx_proxy_cache_use_stale }};
+{% endif -%}
+{% if nginx_proxy_cache_key -%}
+    proxy_cache_key         {{ nginx_proxy_cache_key }};
+{% endif -%}

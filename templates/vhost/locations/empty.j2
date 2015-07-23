@@ -1,0 +1,24 @@
+{# TESTING required #}
+{% if nginx_location_custom_cfg -%}
+  {% for key,value in nginx_location_custom_cfg|dictsort -%}
+    {{ key }} {{ value }};
+  {% endfor -%}
+{% endif -%}
+
+{# note: Below is a block comment - the original erb template from puppet-nginx
+<% if @location_custom_cfg -%>
+  <%- @location_custom_cfg.sort_by {|k,v| k}.each do |key,value| -%>
+    <%- if value.is_a?(Hash) -%>
+      <%- value.sort_by {|k,v| k}.each do |subkey,subvalue| -%>
+        <%- Array(subvalue).each do |asubvalue| -%>
+    <%= key %> <%= subkey %> <%= asubvalue %>;
+        <%- end -%>
+      <%- end -%>
+    <%- else -%>
+      <%- Array(value).each do |asubvalue| -%>
+    <%= key %> <%= asubvalue %>;
+      <%- end -%>
+    <%- end -%>
+  <%- end -%>
+<% end -%>
+#}

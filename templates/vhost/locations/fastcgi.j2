@@ -1,0 +1,21 @@
+{% if nginx_www_root is defined -%}
+    root          {{ nginx_www_root }};
+{% endif -%}
+    include       {{ nginx_fastcgi_params }};
+{% if nginx_try_files -%}
+    try_files    {{ nginx_try_files|join(' ') }};
+{% endif -%}
+
+    fastcgi_pass  {{ nginx_fastcgi }};
+{% if nginx_fastcgi_split_path -%}
+    fastcgi_split_path_info {{ nginx_fastcgi_split_path }};
+{% endif -%}
+{% if nginx_fastcgi_param is defined -%}
+    {% set field_width = nginx_fastcgi_param.keys()|map('length')|max %}
+	{% set key,value in nginx_fastcgi_param|dictsort %}
+    fastcgi_param {{ key.ljust(field_width) }} {{ value }};
+    {% endfor -%}
+    {% if nginx_fastcgi_script is defined %}
+    fastcgi_param SCRIPT_FILENAME {{ nginx_fastcgi_script }};
+    {% endif -%}
+{% endif -%}

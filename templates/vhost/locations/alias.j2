@@ -1,0 +1,4 @@
+    alias {{ nginx_location_alias }};
+{% if nginx_autoindex is defined -%}
+    autoindex {{ nginx_autoindex }};
+{% endif -%}
