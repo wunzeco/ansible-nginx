@@ -1,0 +1,22 @@
+{% if nginx_include_files -%}
+{% for file in nginx_include_files %}
+  include {{ file }};
+{% endfor %}
+{% endif -%}
+{% if nginx_vhost_cfg_append -%}
+{% for key,value in nginx_vhost_cfg_append|dictsort %}
+{# NOTE: value may only be a string or a list #}
+{% if value is not string and value is iterable%}
+{% for asubvalue in value %}
+  {{ key }} {{ asubvalue }};
+{% endfor %}
+{% else %}
+  {{ key }} {{ value }};
+{% endif %}
+{% endfor %}
+{% endif -%}
+
+{% for line in nginx_raw_append %}
+  {{ line }}
+{% endfor -%}
+}
