@@ -115,3 +115,24 @@ nginx_nginx_mailhosts:                  {},
 nginx_nginx_upstreams:                  {},
 nginx_nginx_vhosts:                     {},
 nginx_nginx_vhosts_defaults:            {},
+
+### START Geo ###
+config_nginx_geo:          false
+nginx_geo_name:
+nginx_geo_networks:        {}
+nginx_geo_default:         ''
+nginx_geo_ranges:          false
+nginx_geo_address:         ''
+nginx_geo_delete:          ''
+nginx_geo_proxies:         []
+nginx_geo_proxy_recursive: false
+### END Geo ###
+
+### START Map ###
+config_nginx_map:          false
+nginx_map_name:
+nginx_map_string:
+nginx_map_mappings:
+nginx_map_default:
+nginx_map_hostnames  = false
+### END Map ###

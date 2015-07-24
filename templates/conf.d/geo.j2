@@ -1,4 +1,4 @@
-geo {{ nginx_geo_address|default('') }}${{ nginx_goe_name }} {
+geo {{ nginx_geo_address|default('') }} ${{ nginx_goe_name }} {
 {% if nginx_geo_ranges -%}
   ranges;
 {% endif -%}
