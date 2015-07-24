@@ -158,3 +158,11 @@ nginx_mailhost_auth_http:           ''      # HTTP-like server for authorization
 nginx_mailhost_xclient:             'on'    # whether to use xclient for smtp (on|off)
 nginx_mailhost_server_name:         [ "{{ nginx_mailhost_name }}" ]  # list of mailhostnames for which this mailhost will respond.
 ### END Mailhost ###
+
+### START Upstream ###
+config_nginx_upstream:  false
+nginx_upstream_name:
+nginx_upstream_members: []
+nginx_upstream_cfg_prepend:  {}
+nginx_upstream_fail_timeout: '10s'
+### END Upstream ###
