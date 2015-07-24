@@ -1,0 +1,28 @@
+geo {{ nginx_geo_address|default('') }}${{ nginx_goe_name }} {
+{% if nginx_geo_ranges -%}
+  ranges;
+{% endif -%}
+{% if nginx_geo_default -%}
+  default {{ nginx_geo_default }};
+{% endif -%}
+{% if nginx_geo_delete -%}
+  delete {{ nginx_geo_delete }};
+{% endif -%}
+
+{% if nginx_geo_proxies -%}
+
+{% if nginx_geo_proxy_recursive -%}
+  proxy_recursive;
+{% end -%}
+{% for proxy in nginx_geo_proxies -%}
+  proxy {{ proxy }};
+{% endfor -%}
+{% endif -%}
+
+{% if nginx_geo_networks %}
+{% set field_width = nginx_geo_networks.keys()|map('length')|max %}
+{% for key,value in nginx_geo_networks|dictsort %}
+  {{ key.ljust(field_width) }} {{ value }};
+{% endfor %}
+{% endif -%}
+}

@@ -1,10 +1,10 @@
 map {{ nginx_map_string }} ${{ nginx_map_name }} {
 {% if nginx_map_hostnames -%}
   hostnames;
-{% end -%}
+{% endif -%}
 {% if nginx_map_default -%}
-  default {{ @default }};
-{% end -%}
+  default {{ nginx_map_default }};
+{% endif -%}
 
 {% if nginx_mappings -%}
 {% set field_width = nginx_mappings.keys()|map('length')|max %}
