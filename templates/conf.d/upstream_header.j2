@@ -1,0 +1,13 @@
+upstream {{ nginx_upstream_name }} {
+{% if nginx_upstream_cfg_prepend -%}
+{% for key,value in nginx_upstream_cfg_prepend|dictsort %}
+{# NOTE: value may only be a string or a list #}
+{% if value is not string and value is iterable%}
+{% for asubvalue in value %}
+  {{ key }} {{ asubvalue }};
+{% endfor %}
+{% else %}
+  {{ key }} {{ value }};
+{% endif %}
+{% endfor %}
+{% endif -%}
