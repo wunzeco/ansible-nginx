@@ -1,0 +1,7 @@
+---
+nginx_manage_repo: true
+nginx_user: www-data
+
+nginx_repo: "http://nginx.org/packages/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} nginx"
+nginx_mainline_repo: "http://nginx.org/packages/mainline/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} nginx"
+nginx_passenger_repo: "https://oss-binaries.phusionpassenger.com/apt/passenger {{ ansible_distribution_release|lower }} main"
