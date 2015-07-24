@@ -1,0 +1,27 @@
+---
+# Remember to cleanup nginx_conf_fragments_dir as pre-task before configs
+
+- set_fact: 
+      _fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.mail.d"
+      _config_file: "{{ nginx_conf_dir }}/conf.mail.d/{{ nginx_mailhost_name }}.conf"
+
+- name: Validate ssl_cert and ssl_key
+  fail: msg="nginx: SSL certificat/key must be defined"
+  when: nginx_mailhost_ssl or nginx_mailhost_starttls|match('on|only') and
+            (nginx_mailhost_ssl_cert == '' or nginx_mailhost_ssl_key == '') and
+                config_nginx_mailhost
+
+- name: Create nginx mailhost config fragments dir
+  file: path={{ _fragments_dir }} state=directory
+
+- name: Create nginx mailhost header config
+  template: src=conf.d/mailhost.j2 dest={{ _fragments_dir }}/{{ nginx_mailhost_name }}-header owner=root group=root mode=0644 state=present
+  when: config_nginx_mailhost
+
+- name: Create nginx mailhost ssl config
+  template: src=conf.d/mailhost_ssl.j2 dest={{ _fragments_dir }}/{{ nginx_mailhost_name }}-ssl owner=root group=root mode=0644 state=present
+  when: config_nginx_mailhost
+  notify: Restart nginx
+
+- name: Assemble nginx mailhost config
+  assemble: src={{ _fragments_dir }} dest={{ _config_file }}

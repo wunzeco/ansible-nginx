@@ -5,6 +5,7 @@ nginx_log_dir:                /var/log/nginx
 nginx_run_dir:                /var/nginx
 nginx_temp_dir:               /tmp
 nginx_pid_file:               /var/run/nginx.pid
+nginx_conf_fragments_dir:     /tmp/nginx-config-assemble.d
 
 nginx_client_body_temp_path:  "{{ nginx_run_dir }}/client_body_temp"
 nginx_daemon_user:            nginx
@@ -129,10 +130,31 @@ nginx_geo_proxy_recursive: false
 ### END Geo ###
 
 ### START Map ###
-config_nginx_map:          false
+config_nginx_map:     false
 nginx_map_name:
 nginx_map_string:
-nginx_map_mappings:
-nginx_map_default:
-nginx_map_hostnames  = false
+nginx_map_mappings:   {}
+nginx_map_default:    ''
+nginx_map_hostnames:  false
 ### END Map ###
+
+### START Mailhost ###
+config_nginx_mailhost:              false
+nginx_mailhost_name:
+nginx_mailhost_listen_port:         80
+nginx_mailhost_listen_ip:           '*'     # accepts a string or a list of IPs
+nginx_mailhost_listen_options:      ''
+nginx_mailhost_ipv6_enable:         false
+nginx_mailhost_ipv6_listen_ip:      '::'    # accepts a string or a list of IPs
+nginx_mailhost_ipv6_listen_port:    80
+nginx_mailhost_ipv6_listen_options: 'default ipv6only=on',
+nginx_mailhost_ssl:                 false
+nginx_mailhost_ssl_cert:            ''      # pre-generated SSL Certificate file
+nginx_mailhost_ssl_key:             ''      # pre-generated SSL Key file
+nginx_mailhost_ssl_port:            443
+nginx_mailhost_starttls:            'off'   # enable STARTTLS support - (on|off|only)
+nginx_mailhost_protocol:            ''      # mail protocol to use - (imap|pop3|smtp)
+nginx_mailhost_auth_http:           ''      # HTTP-like server for authorization
+nginx_mailhost_xclient:             'on'    # whether to use xclient for smtp (on|off)
+nginx_mailhost_server_name:         [ "{{ nginx_mailhost_name }}" ]  # list of mailhostnames for which this mailhost will respond.
+### END Mailhost ###
