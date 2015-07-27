@@ -1,6 +1,6 @@
 {# TESTING required #}
-{% if nginx_location_custom_cfg -%}
-  {% for key,value in nginx_location_custom_cfg|dictsort -%}
+{% if item.location_custom_cfg|default(false) -%}
+  {% for key,value in item.location_custom_cfg|dictsort -%}
     {{ key }} {{ value }};
   {% endfor -%}
 {% endif -%}

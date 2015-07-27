@@ -1,21 +1,21 @@
-{% if nginx_www_root is defined -%}
-    root          {{ nginx_www_root }};
-{% endif -%}
-    include       {{ nginx_fastcgi_params }};
-{% if nginx_try_files -%}
-    try_files    {{ nginx_try_files|join(' ') }};
-{% endif -%}
+{% if item.www_root|default(false) %}
+    root          {{ item.www_root }};
+{% endif %}
+    include       {{ item.fastcgi_params_file }};
+{% if nginx_try_files|default(false) %}
+    try_files    {{ item.try_files|join(' ') }};
+{% endif %}
 
-    fastcgi_pass  {{ nginx_fastcgi }};
-{% if nginx_fastcgi_split_path -%}
-    fastcgi_split_path_info {{ nginx_fastcgi_split_path }};
-{% endif -%}
-{% if nginx_fastcgi_param is defined -%}
-    {% set field_width = nginx_fastcgi_param.keys()|map('length')|max %}
-	{% set key,value in nginx_fastcgi_param|dictsort %}
+    fastcgi_pass  {{ item.fastcgi_pass }};
+{% if item.fastcgi_split_path|default(false) %}
+    fastcgi_split_path_info {{ item.fastcgi_split_path }};
+{% endif %}
+{% if item.fastcgi_param|default(false) %}
+{% set field_width = item.fastcgi_param.keys()|map('length')|max %}
+{% for key,value in item.fastcgi_param|dictsort %}
     fastcgi_param {{ key.ljust(field_width) }} {{ value }};
-    {% endfor -%}
-    {% if nginx_fastcgi_script is defined %}
-    fastcgi_param SCRIPT_FILENAME {{ nginx_fastcgi_script }};
-    {% endif -%}
-{% endif -%}
+{% endfor %}
+{% if item.fastcgi_script|default(false) %}
+    fastcgi_param SCRIPT_FILENAME {{ item.fastcgi_script }};
+{% endif %}
+{% endif %}

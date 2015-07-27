@@ -1,8 +1,8 @@
-{% if nginx_www_root is defined -%}
-    root  {{ nginx_www_root }};
-{% endif -%}
-{% if nginx_try_files -%}
-    try_files {{ nginx_try_files|join(' ') }};
-{% endif -%}
-    include {{ nginx_uwsgi_params }};
-    uwsgi_pass {{ nginx_uwsgi }};
+{% if item.www_root|default(false) %}
+    root  {{ item.www_root }};
+{% endif %}
+{% if item.try_files|default(false) %}
+    try_files {{ item.try_files|join(' ') }};
+{% endif %}
+    include {{ item.uwsgi_params_file }};
+    uwsgi_pass {{ item.uwsgi_pass }};

@@ -1,33 +1,33 @@
 
-  location {{ nginx_location }} {
-{% if nginx_internal -%}
+  location {{ item.location }} {
+{% if item.internal|default(false) %}
     internal;
-{% endif -%}
-{% if nginx_mp4 -%}
+{% endif %}
+{% if item.mp4|default(false) %}
     mp4;
-{% endif -%}
-{% if nginx_flv -%}
+{% endif %}
+{% if item.flv|default(false) %}
     flv;
-{% endif -%}
-{% if nginx_location_allow -%}
-    {% for allow_rule in nginx_location_allow -%}
+{% endif %}
+{% if item.location_allow|default(false) %}
+{% for allow_rule in item.location_allow %}
     allow {{ allow_rule }};
-    {% endfor -%}
+{% endfor %}
 {% endif -%}
-{% if nginx_location_deny -%}
-    {% for deny_rule in nginx_location_deny -%}
+{% if item.location_deny|default(false) %}
+{% for deny_rule in item.location_deny %}
     deny {{ deny_rule }};
-    {% endfor -%}
-{% endif -%}
-{% if nginx_auth_basic -%}
-    auth_basic           "{{ nginx_auth_basic }}";
-{% endif -%}
-{% if nginx_auth_basic_user_file -%}
-    auth_basic_user_file {{ nginx_auth_basic_user_file }};
-{% endif -%}
+{% endfor %}
+{% endif %}
+{% if item.auth_basic|default(false) %}
+    auth_basic           "{{ item.auth_basic }}";
+{% endif %}
+{% if item.auth_basic_user_file|default(false) %}
+    auth_basic_user_file {{ item.auth_basic_user_file }};
+{% endif %}
 
-{% if nginx_location_custom_cfg_prepend -%}
-{% for key,value in nginx_location_custom_cfg_prepend.iteritems() %}
+{% if item.location_custom_cfg_prepend|default(false) %}
+{% for key,value in item.location_custom_cfg_prepend.iteritems() %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
@@ -37,10 +37,10 @@
     {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif -%}
+{% endif %}
 
-{% if nginx_location_cfg_prepend -%}
-{% for key,value in nginx_location_cfg_prepend|dictsort %}
+{% if item.location_cfg_prepend|default(false) -%}
+{% for key,value in item.location_cfg_prepend|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
@@ -50,16 +50,16 @@
     {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif -%}
+{% endif %}
 
-{% if nginx_raw_prepend is not defined and nginx_raw_prepend|default([])|count > 0 %}
-{% for line in nginx_raw_prepend %}
+{% if item.raw_prepend|default(false) and item.raw_prepend|default([])|count > 0 %}
+{% for line in item.raw_prepend %}
     {{ line }}
 {% endfor %}
 {% endif %}
 
-{% if nginx_rewrite_rules is not defined or nginx_rewrite_rules|default([])|count > 0 %}
-{% for rewrite_rule in nginx_rewrite_rules %}
+{% if item.rewrite_rules|default(false) or item.rewrite_rules|default([])|count > 0 %}
+{% for rewrite_rule in item.rewrite_rules %}
     rewrite {{ rewrite_rule }}
 {% endfor %}
 {% endif %}

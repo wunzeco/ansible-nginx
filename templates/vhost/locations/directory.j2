@@ -1,13 +1,13 @@
-{% if nginx_www_root is defined -%}
-    root      {{ nginx_www_root }};
-{% endif -%}
-{% if nginx_autoindex is defined -%}
-
-    autoindex {{ nginx_autoindex }};
-{% endif -%}
-{% if nginx_index_files %}
-    index    {{ nginx_index_files|join(' ') }};
+{% if item.www_root|default(false) %}
+    root      {{ item.www_root }};
 {% endif %}
-{% if nginx_try_files -%>
-    try_files {{ nginx_try_files|join(' ') }};
-{% endif -%>
+{% if item.autoindex|default(false) %}
+
+    autoindex {{ item.autoindex }};
+{% endif %}
+{% if item.index_files %}
+    index    {{ item.index_files|join(' ') }};
+{% endif %}
+{% if item.try_files|default(false) %}
+    try_files {{ item.try_files|join(' ') }};
+{% endif %}
