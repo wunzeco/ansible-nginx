@@ -1,5 +1,5 @@
 ---
 
 - name: Start nginx
-  service: name={{ nginx_service_name }} enable={{ nginx_service_enable }} state={{ nginx_service_ensure }}
+  service: name={{ nginx_service_name }} enabled={{ nginx_service_enable }} state={{ nginx_service_state }}
 
