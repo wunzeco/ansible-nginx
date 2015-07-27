@@ -6,3 +6,6 @@
   
 - name: Restart nginx
   service: name={{ nginx_service_name }} state=restarted
+
+- name: Update nginx apt cache
+  apt: update_cache=yes
