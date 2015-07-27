@@ -1,3 +1,11 @@
 ---
+- include_vars: "{{ ansible_os_family }}.yml"
 
-- include: "package_{{ ansible_os_family|lower }}.yml"
+# For some reason, ansible errors if ansible_os_family fact is used as below
+#- include: package/{{ ansible_os_family }}.yml
+
+- include: package/Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include: package/RedHat.yml
+  when: ansible_os_family == 'RedHat'
