@@ -7,6 +7,8 @@
 - name: Add phusion passenger repo to sources list
   apt_repository: repo="deb {{ nginx_passenger_repo }}" state=present
   when: nginx_manage_repo and nginx_package_source == 'passenger'
+  register: passenger_repo
+  notify: Update nginx apt cache
 
 - name: Add nginx repo apt key
   apt_key: keyserver=keyserver.ubuntu.com id=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
@@ -15,13 +17,17 @@
 - name: Add nginx repo to sources list
   apt_repository: repo="deb {{ nginx_repo }}" state=present
   when: nginx_manage_repo and nginx_package_source|match('nginx|nginx-stable')
+  register: default_repo
+  notify: Update nginx apt cache
 
 - name: Add nginx mainline repo to sources list
   apt_repository: repo="deb {{ nginx_mainline_repo }}" state=present
   when: nginx_manage_repo and nginx_package_source == 'nginx-mainline'
+  register: mainline_repo
+  notify: Update nginx apt cache
 
-- name: Update apt cache
-  apt: update_cache=yes cache_valid_time=1800
+- meta: flush_handlers
+  when: default_repo|changed or mainline_repo|changed or passenger_repo|changed
 
 - name: Install phusion passenger prerequisites
   apt: name={{ item }} state=present
