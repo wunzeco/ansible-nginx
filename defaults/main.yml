@@ -16,7 +16,6 @@ nginx_http_access_log:        "{{ nginx_log_dir }}/access.log"
 nginx_manage_repo:            true
 nginx_nginx_error_log:        "{{ nginx_log_dir }}/error.log"
 nginx_root_group:             root
-nginx_package_name:           nginx
 nginx_proxy_temp_path:        "{{ nginx_run_dir }}/proxy_temp"
 nginx_sites_available_owner:  'root'
 nginx_sites_available_group:  "{{ nginx_root_group }}"
@@ -39,7 +38,7 @@ nginx_fastcgi_cache_max_size:          '500m'
 nginx_fastcgi_cache_path:              false
 nginx_fastcgi_cache_use_stale:         false
 nginx_gzip:                            'on'
-nginx_gzip_buffers:                    undef
+nginx_gzip_buffers: 
 nginx_gzip_comp_level:                 1
 nginx_gzip_disable:                    'msie6'
 nginx_gzip_min_length:                 20
@@ -66,7 +65,7 @@ nginx_proxy_cache_max_size:            '500m'
 nginx_proxy_cache_path:                false
 nginx_proxy_connect_timeout:           '90'
 nginx_proxy_headers_hash_bucket_size:  '64'
-nginx_proxy_http_version:              undef
+nginx_proxy_http_version:
 nginx_proxy_read_timeout:              '90'
 nginx_proxy_redirect:                  'off'
 nginx_proxy_send_timeout:              '90'
@@ -93,15 +92,14 @@ nginx_proxy_conf_template:              'conf.d/nginx.conf.j2'
 ### END Module/App Configuration ###
 
 ### START Package Configuration ###
-nginx_package_ensure:                   present,
-nginx_package_name:                     $::nginx::params::package_name,
-nginx_package_source:                   'nginx',
+nginx_package_name:                     nginx
+nginx_package_source:                   nginx
 nginx_package_flavor:
 ### END Package Configuration ###
 
 ### START Service Configuation ###
 nginx_configtest_enable:                false
-nginx_service_ensure:                   started
+nginx_service_state:                    started
 nginx_service_enable:                   true
 nginx_service_flags:
 nginx_service_restart:                  '/etc/init.d/nginx configtest && /etc/init.d/nginx restart'
@@ -109,13 +107,13 @@ nginx_service_name:                     nginx
 ### END Service Configuration ###
 
 ### START Hiera Lookups ###
-nginx_geo_mappings:                     {},
-nginx_string_mappings:                  {},
-nginx_nginx_locations:                  {},
-nginx_nginx_mailhosts:                  {},
-nginx_nginx_upstreams:                  {},
-nginx_nginx_vhosts:                     {},
-nginx_nginx_vhosts_defaults:            {},
+nginx_geo_mappings:                     {}
+nginx_string_mappings:                  {}
+nginx_nginx_locations:                  {}
+nginx_nginx_mailhosts:                  {}
+nginx_nginx_upstreams:                  {}
+nginx_nginx_vhosts:                     {}
+nginx_nginx_vhosts_defaults:            {}
 
 ### START Geo ###
 config_nginx_geo:          false
@@ -147,7 +145,7 @@ nginx_mailhost_listen_options:      ''
 nginx_mailhost_ipv6_enable:         false
 nginx_mailhost_ipv6_listen_ip:      '::'    # accepts a string or a list of IPs
 nginx_mailhost_ipv6_listen_port:    80
-nginx_mailhost_ipv6_listen_options: 'default ipv6only=on',
+nginx_mailhost_ipv6_listen_options: 'default ipv6only=on'
 nginx_mailhost_ssl:                 false
 nginx_mailhost_ssl_cert:            ''      # pre-generated SSL Certificate file
 nginx_mailhost_ssl_key:             ''      # pre-generated SSL Key file
@@ -166,3 +164,54 @@ nginx_upstream_members: []
 nginx_upstream_cfg_prepend:  {}
 nginx_upstream_fail_timeout: '10s'
 ### END Upstream ###
+
+### START Location ###
+#config_nginx_location:  false
+#nginx_location_name:
+#nginx_location_internal:              false
+#nginx_location:              $name
+#nginx_location_vhost:                 undef
+#nginx_location_www_root:              undef
+#nginx_location_autoindex:             undef
+#nginx_location_index_files:           [ 'index.html', 'index.htm', 'index.php' ]
+#nginx_location_proxy:                 undef
+#nginx_location_proxy_redirect:        "{{ nginx_proxy_redirect }}"
+#nginx_location_proxy_read_timeout:    "{{ nginx_proxy_read_timeout }}"
+#nginx_location_proxy_connect_timeout: "{{ nginx_proxy_connect_timeout }}"
+#nginx_location_proxy_set_header:      "{{ nginx_proxy_set_header }}"
+#nginx_location_fastcgi:               undef
+#nginx_location_fastcgi_param:         undef
+#nginx_location_fastcgi_params:        "${::nginx::config::conf_dir}/fastcgi_params"
+#nginx_location_fastcgi_script:        undef
+#nginx_location_fastcgi_split_path:    undef
+#nginx_location_uwsgi:                 undef
+#nginx_location_uwsgi_params:          "${nginx::config::conf_dir}/uwsgi_params"
+#nginx_location_ssl:                   false
+#nginx_location_ssl_only:              false
+#nginx_location_alias:        undef
+#nginx_location_allow:        undef
+#nginx_location_deny:         undef
+#nginx_location_option:                undef
+#nginx_location_stub_status:           undef
+#nginx_location_raw_prepend:           undef
+#nginx_location_raw_append:            undef
+#nginx_location_custom_cfg:   undef
+#nginx_location_cfg_prepend:  undef
+#nginx_location_cfg_append:   undef
+#nginx_location_custom_cfg_prepend:   undef
+#nginx_location_custom_cfg_append:    undef
+#nginx_location_include:               undef
+#nginx_location_try_files:             undef
+#nginx_location_proxy_cache:           false
+#nginx_location_proxy_cache_key:       undef
+#nginx_location_proxy_cache_use_stale:  undef
+#nginx_location_proxy_cache_valid:     false
+#nginx_location_proxy_method:          undef
+#nginx_location_proxy_set_body:        undef
+#nginx_location_auth_basic:            undef
+#nginx_location_auth_basic_user_file:  undef
+#nginx_location_rewrite_rules:         []
+#nginx_location_priority:              500
+#nginx_location_mp4:              false
+#nginx_location_flv:              false
+### END Location ###
