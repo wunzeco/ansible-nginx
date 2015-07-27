@@ -215,3 +215,71 @@ nginx_upstream_fail_timeout: '10s'
 #nginx_location_mp4:              false
 #nginx_location_flv:              false
 ### END Location ###
+
+
+
+### START Location ###
+
+nginx_fastcgi_pass:
+nginx_fastcgi_param:
+nginx_fastcgi_params_file:        "{{ nginx_conf_dir }}/fastcgi_params"
+nginx_fastcgi_script:
+nginx_fastcgi_split_path:
+nginx_uwsgi:
+nginx_uwsgi_params:          "{{ nginx_conf_dir }}/uwsgi_params"
+
+
+config_nginx_location:  false
+nginx_location:
+  - vhost:                  myvhost
+    internal:              false
+    location:              /hello/world   
+    www_root:              /var/www 
+    autoindex:           
+    index_files:           [ 'index.html', 'index.htm', 'index.php' ]
+    proxy_pass:            'http://localhost:8080'  
+    proxy_redirect:        "{{ nginx_proxy_redirect }}"
+    proxy_read_timeout:    "{{ nginx_proxy_read_timeout }}"
+    proxy_connect_timeout: "{{ nginx_proxy_connect_timeout }}"
+    proxy_set_header:      "{{ nginx_proxy_set_header }}"
+    fastcgi_script:
+    fastcgi_split_path:
+    fastcgi_pass:          'localhost:9000'
+    fastcgi_param:
+      REQUEST_METHOD:   '$request_method'
+      CONTENT_TYPE:     '$content_type'
+      CONTENT_LENGTH:   '$content_length'
+    fastcgi_params_file:   "{{ nginx_conf_dir }}/fastcgi_params"
+    fastcgi_script:
+    fastcgi_split_path:
+    uwsgi_pass:            'localhost:9000'
+    uwsgi_params_file:     "{{ nginx_conf_dir }}/uwsgi_params"
+    ssl:
+    ssl_only:
+    location_alias:        html/test/dir
+    location_allow:
+    location_deny:
+    option:
+    stub_status:          true  # should default to false or not defined at all
+    raw_prepend:
+    raw_append:
+    custom_cfg:
+    location_cfg_prepend:
+    location_cfg_append:
+    location_custom_cfg_prepend:
+    location_custom_cfg_append: 
+    include:        
+    try_files:     
+    proxy_cache:           false
+    proxy_cache_key:
+    proxy_cache_use_stale:
+    proxy_cache_valid:     false
+    proxy_method:        
+    proxy_set_body:     
+    auth_basic:        
+    auth_basic_user_file:
+    rewrite_rules:         []
+    priority:              500
+    mp4:                   false
+    flv:                   false
+### END Location ###
