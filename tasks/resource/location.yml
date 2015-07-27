@@ -1,0 +1,86 @@
+---
+# Remember to cleanup nginx_conf_fragments_dir as pre-task before configs
+
+- set_fact: 
+      _fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.location.d"
+      #_config_file: "{{ nginx_conf_dir }}/sites-available/{{ _vhost }}.conf"
+      #_vhost: "{{ nginx_location_vhost|regex_replace(' ', '_') }}"
+      #_location: "{{ nginx_location_location|regex_replace('\/', '_') }}"
+
+- name: Validate nginx_location_vhost
+  fail: msg="Cannot create a location reference without attaching to a virtual host"
+  when: item.vhost is not defined
+  with_items: nginx_location
+
+- name: Validate nginx_location params
+  fail: msg="Cannot create a location reference without a www_root, proxy, location_alias, fastcgi, uwsgi, stub_status, internal or location_custom_cfg defined"
+  when: (item.www_root is not defined) and (item.proxy_pass is not defined)
+            (item.location_alias is not defined) and (item.stub_status is not defined)
+                (item.fastcgi_pass is not defined) and (item.uwsgi_pass is not defined)
+                    (item.custom_cfg is not defined) and (item.internal is not defined)
+  with_items: nginx_location
+
+- name: Validate www_root and proxy variables are not both defined
+  fail: msg="Cannot define both directory and proxy in a virtual host"
+  when: (item.www_root is defined and item.www_root) and (item.proxy_pass is defined and item.proxy_pass)
+  with_items: nginx_location
+
+- name: Validate vhost name
+  fail: msg="Cannot have whitespace or '/' in vhost name"
+  when: item.vhost|search(' ')
+  with_items: nginx_location
+
+- name: Create nginx location config fragments dir
+  file: path={{ _fragments_dir }} state=directory
+
+- name: Create nginx location config fragments sub directories
+  file: path={{ _fragments_dir }}/{{ item.vhost }} state=directory
+  with_items: nginx_location
+
+- name: Create nginx fastcgi params conf file
+  template: src=../../templates/vhost/fastcgi_params.j2 dest={{ nginx_fastcgi_params_file }} owner=root group=root mode=0644
+  when: item.fastcgi_pass
+  with_items: nginx_location
+
+- name: Create nginx uwsgi params conf file
+  template: src=../../templates/vhost/uwsgi_params.j2 dest={{ item.uwsgi_params_file }} owner=root group=root mode=0644
+  when: item.uwsgi_pass
+  with_items: nginx_location
+
+# BBBB
+- name: Create nginx location proxy config fragment 
+  template: src=../../templates/vhost/locations/proxy.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/proxy.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.proxy_pass is defined and item.proxy_pass
+  with_items: nginx_location
+
+- name: Create nginx location alias config fragment 
+  template: src=../../templates/vhost/locations/alias.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/alias.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.location_alias is defined and item.location_alias 
+  with_items: nginx_location
+
+- name: Create nginx location stub_status config fragment 
+  template: src=../../templates/vhost/locations/stub_status.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/stub_status.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.stub_status is defined and item.stub_status 
+  with_items: nginx_location
+
+- name: Create nginx location fastcgi config fragment 
+  template: src=../../templates/vhost/locations/fastcgi.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/fastcgi.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.fastcgi_pass is defined and item.fastcgi_pass
+  with_items: nginx_location
+
+- name: Create nginx location uwsgi config fragment 
+  template: src=../../templates/vhost/locations/uwsgi.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/uwsgi.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.uwsgi_pass is defined and item.uwsgi_pass
+  with_items: nginx_location
+
+- name: Create nginx location www_root dir config fragment 
+  template: src=../../templates/vhost/locations/directory.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/directory.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: item.www_root is defined and item.www_root 
+  with_items: nginx_location
+
+- name: Create nginx location custom config fragment 
+  template: src=../../templates/vhost/locations/empty.j2 dest={{ _fragments_dir }}/{{ item.vhost }}/empty.{{ item.location|regex_replace('/', '_') }} owner=root group=root mode=0644
+  when: not (item.proxy or item.location_alias or item.stub_status or item.fastcgi or item.uwsgi or item.www_root)
+  with_items: nginx_location
+
+  

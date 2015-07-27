@@ -59,7 +59,7 @@
   file: path={{ nginx_conf_dir }}/sites-enabled/default state=absent
 
 - name: Create nginx conf file
-  template: src={{ nginx_conf_template }} dest={{ nginx_conf_dir }}/nginx.conf owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0644 state=present
+  template: src={{ nginx_conf_template }} dest={{ nginx_conf_dir }}/nginx.conf owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0644
   notify: 
     - Validate nginx config
     - Restart nginx
@@ -78,3 +78,5 @@
 
 - name: Delete nginx mail temp directory
   file: path={{ nginx_temp_dir }}/nginx.mail.d state=absent
+
+- include: resource/location.yml
