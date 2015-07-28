@@ -1,26 +1,7 @@
 ---
-# Remember to cleanup nginx_conf_fragments_dir as pre-task before configs
 
-- set_fact: 
-      _fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.upstream.d"
-      _config_file: "{{ nginx_conf_dir }}/conf.d/{{ nginx_upstream_name }}-upstream.conf"
-
-- name: Create nginx upstream config fragments dir
-  file: path={{ _fragments_dir }} state=directory
-
-- name: Create nginx upstream header config
-  template: src=conf.d/upstream_header.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-header owner=root group=root mode=0644
+- name: Create nginx upstream config
+  template: src=../../templates/conf.d/upstream.j2 dest={{ nginx_conf_dir }}/conf.d/{{ item.name }}-upstream.conf owner=root group=root mode=0644
   when: config_nginx_upstream
-
-- name: Create nginx upstream ssl config
-  template: src=conf.d/upstream_members.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-members owner=root group=root mode=0644
-  when: config_nginx_upstream
-
-- name: Create nginx upstream footer config
-  copy: content="}\n" dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-footer owner=root group=root mode=0644 state=present
-  when: config_nginx_upstream
-
-- name: Assemble nginx upstream config
-  assemble: src={{ _fragments_dir }} dest={{ _config_file }}
-  when: config_nginx_upstream
+  with_items: nginx_upstream
   notify: Restart nginx

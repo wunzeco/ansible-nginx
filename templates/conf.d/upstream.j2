@@ -1,0 +1,18 @@
+upstream {{ item.name }} {
+{% if item.upstream_cfg_prepend|default(false) %}
+{% for key,value in item.upstream_cfg_prepend|dictsort %}
+{# NOTE: value may only be a string or a list #}
+{% if value is not string and value is iterable %}
+{% for asubvalue in value %}
+  {{ key }} {{ asubvalue }};
+{% endfor %}
+{% else %}
+  {{ key }} {{ value }};
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% for m in item.members %}
+  server     {{ m }}  fail_timeout={{ item.upstream_fail_timeout|default('10s') }};
+{% endfor %}
+}
