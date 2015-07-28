@@ -32,7 +32,6 @@ server {
   listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
 {% endif %}
 {% endif %}
-======
 
   server_name           {{ item.server_name|join(" ") }};
   protocol              {{ item.protocol }};
