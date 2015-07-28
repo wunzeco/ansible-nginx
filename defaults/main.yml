@@ -117,14 +117,28 @@ nginx_nginx_vhosts_defaults:            {}
 
 ### START Geo ###
 config_nginx_geo:          false
-nginx_geo_name:
-nginx_geo_networks:        {}
-nginx_geo_default:         ''
-nginx_geo_ranges:          false
-nginx_geo_address:         ''
-nginx_geo_delete:          ''
-nginx_geo_proxies:         []
-nginx_geo_proxy_recursive: false
+nginx_geo:
+  - name:
+    networks:        {}
+    default:         ''
+    ranges:          false
+    address:         ''
+    delete:          ''
+    proxies:         []
+    proxy_recursive: false
+
+## Example: nginx_geo
+## config_nginx_geo:     true
+## nginx_geo:
+##   - name:             client_network
+##     ranges:           false
+##     default:          extra
+##     proxy_recursive:  false
+##     proxies:          [ '192.168.99.99' ]
+##     networks: 
+##       '10.0.0.0/8':      'intra'
+##       '172.16.0.0/12':   'intra'
+##       '192.168.0.0/16':  'intra'
 ### END Geo ###
 
 ### START Map ###

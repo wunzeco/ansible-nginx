@@ -1,28 +1,27 @@
-geo {{ nginx_geo_address|default('') }} ${{ nginx_goe_name }} {
-{% if nginx_geo_ranges -%}
+geo {{ item.address|default('') }} ${{ item.name }} {
+{% if item.ranges|default(false) %}
   ranges;
-{% endif -%}
-{% if nginx_geo_default -%}
-  default {{ nginx_geo_default }};
-{% endif -%}
-{% if nginx_geo_delete -%}
-  delete {{ nginx_geo_delete }};
-{% endif -%}
+{% endif %}
+{% if item.default|default(false) %}
+  default {{ item.default }};
+{% endif %}
+{% if item.delete|default(false) %}
+  delete {{ item.delete }};
+{% endif %}
 
-{% if nginx_geo_proxies -%}
-
-{% if nginx_geo_proxy_recursive -%}
+{% if item.proxies|default(false) and item.proxies is iterable %}
+{% if item.proxy_recursive|default(false) %}
   proxy_recursive;
-{% end -%}
-{% for proxy in nginx_geo_proxies -%}
+{% endif %}
+{% for proxy in item.proxies %}
   proxy {{ proxy }};
-{% endfor -%}
-{% endif -%}
+{% endfor %}
+{% endif %}
 
-{% if nginx_geo_networks %}
-{% set field_width = nginx_geo_networks.keys()|map('length')|max %}
-{% for key,value in nginx_geo_networks|dictsort %}
+{% if item.networks %}
+{% set field_width = item.networks.keys()|map('length')|max %}
+{% for key,value in item.networks|dictsort %}
   {{ key.ljust(field_width) }} {{ value }};
 {% endfor %}
-{% endif -%}
+{% endif %}
 }
