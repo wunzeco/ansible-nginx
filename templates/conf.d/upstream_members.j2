@@ -1,3 +1,0 @@
-{% for m in nginx_members %}
-  server     {{ m }}  fail_timeout={{ @upstream_fail_timeout }};
-{% endfor %}
