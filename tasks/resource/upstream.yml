@@ -9,11 +9,11 @@
   file: path={{ _fragments_dir }} state=directory
 
 - name: Create nginx upstream header config
-  template: src=conf.d/upstream_header.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-header owner=root group=root mode=0644 state=present
+  template: src=conf.d/upstream_header.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-header owner=root group=root mode=0644
   when: config_nginx_upstream
 
 - name: Create nginx upstream ssl config
-  template: src=conf.d/upstream_members.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-members owner=root group=root mode=0644 state=present
+  template: src=conf.d/upstream_members.j2 dest={{ _fragments_dir }}/{{ nginx_upstream_name }}-members owner=root group=root mode=0644
   when: config_nginx_upstream
 
 - name: Create nginx upstream footer config

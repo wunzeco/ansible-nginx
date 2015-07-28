@@ -3,7 +3,7 @@
   when: ansible_distribution|lower != 'centos'
 
 - name: Configure nginx yum repo
-  template: src=nginx.yum.repo.j2 dest=/etc/yum.repos.d/nginx.repo state=present
+  template: src=nginx.yum.repo.j2 dest=/etc/yum.repos.d/nginx.repo
   when: nginx_manage_repo
 
 - name: Install nginx package
