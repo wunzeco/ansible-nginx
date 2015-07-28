@@ -1,79 +1,96 @@
-{% if nginx_rewrite_www_to_non_www -%}
+{# *** [START] set _listen_options *** #}
+{% if item.listen_options|default(false) %}
+{% set _listen_options = ' ' + item.listen_options %}
+{% else %}
+{% set _listen_options = '' %}
+{% endif %}
+{% if item.ipv6_listen_options|default(false) %}
+{% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
+{% else %}
+{% set _ipv6_listen_options = '' %}
+{% endif %}
+{# *** [END] set _listen_options *** #}
+
+{% if item.rewrite_www_to_non_www|default(false) %}
 server {
-{# Note: the value of nginx_listen_ip should be a list or a string #}
-{% if nginx_listen_ip is not string and nginx_listen_ip is iterable -%}
-{% for ip in nginx_listen_ip %}
-  listen {{ ip }}:{{ nginx_listen_port }} {{ nginx_listen_options|default('') }};
+{# Note: the value of item.listen_ip should be a list or a string #}
+{% if item.listen_ip|default('*') is not string and item.listen_ip is iterable -%}
+{% for ip in item.listen_ip %}
+  listen {{ ip }}:{{ item.listen_port }}{{ _listen_options }};
 {% endfor %}
 {% else %}
-  listen {{ nginx_listen_ip|default('*') }}:{{ nginx_listen_port }} {{ nginx_listen_options|default('') }};
-{% endif -%}
+  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
+{% endif %}
 {# check to see if ipv6 support exists in the kernel before applying #}
-{% if nginx_ipv6_enable and (ansible_default_ipv6.address is defined) -%}
-{# Note: the value of nginx_ipv6_listen_ip should be a list or a string #}
-{% if nginx_ipv6_listen_ip is not string and nginx_ipv6_listen_ip is iterable -%}
-{% for ipv6 in nginx_ipv6_listen_ip %}
-  listen [{{ ipv6 }}]:{{ nginx_ipv6_listen_port }} {{ nginx_ipv6_listen_options|default('') }};
+{% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) -%}
+{# Note: the value of item.ipv6_listen_ip should be a list or a string #}
+{% if item.ipv6_listen_ip|default('::') is not string and item.ipv6_listen_ip is iterable -%}
+{% for ipv6 in item.ipv6_listen_ip %}
+  listen [{{ ipv6 }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
 {% endfor %}
 {% else %}
-  listen [{{ nginx_ipv6_listen_ip|default('::') }}]:{{ nginx_ipv6_listen_port }} {{ nginx_ipv6_listen_options|default('') }};
-{% endif -%}
-{% endif -%}
-  server_name  www.{{ nginx_server_name[0].gsub(/^www\./, '') }};
-  return       301 http://{{ nginx_server_name[0].gsub(/^www\./, '') }}$request_uri;
+  listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
+{% endif %}
+{% endif %}
+  server_name  www.{{ item.server_name[0]|regex_replace('^www.', '') }};
+  return       301 http://{{ item.server_name[0]|regex_replace('^www.', '') }}$request_uri;
 }
 
-{% end -%}
+{% endif %}
 
 server {
-{# Note: the value of nginx_listen_ip should be a list or a string #}
-{% if nginx_listen_ip is not string and nginx_listen_ip is iterable -%}
-{% for ip in nginx_listen_ip %}
-  listen {{ ip }}:{{ nginx_listen_port }} {{ nginx_listen_options|default('') }};
+{# Note: the value of item.listen_ip should be a list or a string #}
+{% if item.listen_ip|default('*') is not string and item.listen_ip is iterable -%}
+{% for ip in item.listen_ip %}
+  listen {{ ip }}:{{ item.listen_port }}{{ _listen_options }};
 {% endfor %}
 {% else %}
-  listen {{ nginx_listen_ip|default('*') }}:{{ nginx_listen_port }} {{ nginx_listen_options|default('') }};
-{% endif -%}
+  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
+{% endif %}
 
 {# check to see if ipv6 support exists in the kernel before applying #}
-{% if nginx_ipv6_enable and (ansible_default_ipv6.address is defined) -%}
-{# Note: the value of nginx_ipv6_listen_ip should be a list or a string #}
-{% if nginx_ipv6_listen_ip is not string and nginx_ipv6_listen_ip is iterable -%}
-{% for ipv6 in nginx_ipv6_listen_ip %}
-  listen [{{ ipv6 }}]:{{ nginx_ipv6_listen_port }} {{ nginx_ipv6_listen_options|default('') }};
+{% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) -%}
+{# Note: the value of item.ipv6_listen_ip should be a list or a string #}
+{% if item.ipv6_listen_ip|default('::') is not string and item.ipv6_listen_ip is iterable -%}
+{% for ipv6 in item.ipv6_listen_ip %}
+  listen [{{ ipv6 }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
 {% endfor %}
 {% else %}
-  listen [{{ nginx_ipv6_listen_ip|default('::') }}]:{{ nginx_ipv6_listen_port }} {{ nginx_ipv6_listen_options|default('') }};
-{% endif -%}
-{% endif -%}
+  listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
+{% endif %}
+{% endif %}
 
-  server_name           {{ nginx_rewrite_www_to_non_www ? nginx_server_name[0].gsub(/^www\./, '') : nginx_server_name.join(" ") }};
-{% if nginx_auth_basic is defined and nginx_auth_basic -%}
-  auth_basic           "{{ nginx_auth_basic }}";
-{% endif -%}
-{% if nginx_auth_basic_user_file is defined and nginx_auth_basic_user_file -%}
-  auth_basic_user_file {{ nginx_auth_basic_user_file }};
-{% endif -%}
+{% if item.rewrite_www_to_non_www|default(false) %}
+  server_name           {{ item.server_name[0]|regex_replace('^www.', '') }};
+{% else %}
+  server_name           {{ item.server_name|join(" ") }};
+{% endif %}
+{% if item.auth_basic|default(false) %}
+  auth_basic           "{{ item.auth_basic }}";
+{% endif %}
+{% if item.auth_basic_user_file|default(false) %}
+  auth_basic_user_file {{ item.auth_basic_user_file }};
+{% endif %}
 
-{% if nginx_client_body_timeout is defined and nginx_client_body_timeout -%}
-  client_body_timeout {{ nginx_client_body_timeout }};
-{% endif -%}
-{% if nginx_client_header_timeout is defined and nginx_client_header_timeout -%}
-  client_header_timeout {{ nginx_client_header_timeout }};
-{% endif -%}
-{% if nginx_client_max_body_size is defined and nginx_client_max_body_size -%}
-  client_max_body_size {{ nginx_client_max_body_size }};
-{% endif -%}
+{% if item.client_body_timeout|default(false) %}
+  client_body_timeout {{ item.client_body_timeout }};
+{% endif %}
+{% if item.client_header_timeout|default(false) %}
+  client_header_timeout {{ item.client_header_timeout }};
+{% endif %}
+{% if item.client_max_body_size|default(false) %}
+  client_max_body_size {{ item.client_max_body_size }};
+{% endif %}
 
-{% if nginx_gzip_types is defined and nginx_gzip_types-%}
-  gzip_types {{ nginx_gzip_types }};
-{% endif -%}
+{% if item.gzip_types|default(false) %}
+  gzip_types {{ item.gzip_types }};
+{% endif %}
 
 {# make sure that allow comes before deny by forcing the allow key (if it #}
 {# exists) to be first in the output order.  The hash keys also need to be #}
 {# sorted so that the ordering is stable. #}
-{% if nginx_vhost_cfg_prepend -%}
-{% for key,value in nginx_vhost_cfg_prepend|dictsort %}
+{% if item.vhost_cfg_prepend|default(false) -%}
+{% for key,value in item.vhost_cfg_prepend|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
@@ -85,56 +102,81 @@ server {
 {% endfor %}
 {% endif -%}
 
-{% for line in nginx_raw_prepend %}
+{% if item.location_raw_prepend|default(false) and item.location_raw_prepend is iterable %}
+{% for line in item.location_raw_prepend %}
   {{ line }}
 {% endfor %}
-{% if nginx_root -%}
-  root {{ nginx_root }};
-{% endif -%}
-{% if nginx_passenger_cgi_param -%}
-{% for key,value in nginx_passenger_cgi_param|dictsort %}
+{% endif %}
+
+{% if item.www_root|default(false) %}
+  root {{ item.www_root }};
+{% endif %}
+{% if item.passenger_cgi_param|default(false) %}
+{% for key,value in item.passenger_cgi_param|dictsort %}
   passenger_set_cgi_param  {{ key }} {{ value }};
 {% endfor %}
-{% endif -%}
-{% if nginx_passenger_set_header -%}
-{% for key,value in nginx_passenger_set_header|dictsort %}
+{% endif %}
+{% if item.passenger_set_header|default(false) %}
+{% for key,value in item.passenger_set_header|dictsort %}
   passenger_set_header  {{ key }} {{ value }};
 {% endfor %}
 {% endif -%}
-{% if nginx_passenger_env_var -%}
-{% for key,value in nginx_passenger_env_var|dictsort %}
+{% if item.passenger_env_var|default(false) %}
+{% for key,value in item.passenger_env_var|dictsort %}
   passenger_env_var  {{ key }} {{ value }};
 {% endfor %}
-{% endif -%}
-{% if nginx_resolver|default([])|count > 0 -%}
-  resolver                  {{ nginx_resolver|join(' ') }};
-{% endif -%}
-{% if nginx_add_header -%}
-{% for key,value in nginx_add_header|dictsort %}
+{% endif %}
+{% if item.resolver|default([])|count > 0 %}
+  resolver                  {{ item.resolver|join(' ') }};
+{% endif %}
+{% if item.add_header|default(false) %}
+{% for key,value in item.add_header|dictsort %}
   add_header              {{ key }} {{ value }};
 {% endfor %}
-{% endif -%}
-{% if nginx_maintenance -%}
-  {{ nginx_maintenance_value }};
-{% endif -%}
-{% if nginx_rewrite_to_https -%}
+{% endif %}
+{% if item.maintenance|default(false) %}
+  {{ item.maintenance_value }};
+{% endif %}
+{% if item.rewrite_to_https|default(false) %}
   if ($ssl_protocol = "") {
-{% if nginx_ssl_port != 443 %}
-       return 301 https://$host:{{ nginx_ssl_port }}$request_uri;
+{% if item.ssl_port|default(false) != 443 %}
+       return 301 https://$host:{{ item.ssl_port }}$request_uri;
 {% else %}
        return 301 https://$host$request_uri;
-{% endif -%}
+{% endif %}
   }
+{% endif %}
+{% if item.index_files|default([])|count > 0 -%}
+  index {{ item.index_files|join(' ') }};
 {% endif -%}
-{% if nginx_index_files|default([])|count > 0 -%}
-  index {{ nginx_index_files|join(' ') }};
-{% endif -%}
-{% if nginx_log_by_lua is defined -%}
-  log_by_lua '{{ nginx_log_by_lua }}';
-{% end -%}
-{% if nginx_log_by_lua_file is defined -%}
-  log_by_lua_file "{{ nginx_log_by_lua_file }}";
-{% endif -%}
+{% if item.log_by_lua|default(false) %}
+  log_by_lua '{{ item.log_by_lua }}';
+{% endif %}
+{% if item.log_by_lua_file|default(false) %}
+  log_by_lua_file "{{ item.log_by_lua_file }}";
+{% endif %}
 
-  access_log            {{ nginx_access_log_real }};
-  error_log             {{ nginx_error_log_real }};
+{# *** [START] set _access_log and _error_log *** #}
+{% if item.access_log is defined and item.access_log %}
+{% set _access_log 	= item.access_log %}
+{% set _ssl_access_log 	= 'ssl-' + item.access_log %}
+{% else %}
+{% set _access_log = item.vhost + '.access.log' %}
+{% set _ssl_access_log 	= 'ssl-' + item.vhost + '.access.log' %}
+{% endif %}
+{% if item.error_log is defined and item.error_log %}
+{% set _error_log 	= item.error_log %}
+{% set _ssl_error_log 	= 'ssl-' + item.error_log %}
+{% else %}
+{% set _error_log = item.vhost + '.error.log' %}
+{% set _ssl_error_log 	= 'ssl-' + item.vhost + '.error.log' %}
+{% endif %}
+{# *** [END] set _access_log and _error_log *** #}
+
+{% if item.ssl|default(false) %}
+  access_log            {{ _ssl_access_log }};
+  error_log             {{ _ssl_error_log }};
+{% else %}
+  access_log            {{ _access_log }};
+  error_log             {{ _error_log }};
+{% endif -%}
