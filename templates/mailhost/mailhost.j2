@@ -1,35 +1,47 @@
+{# *** [START] set _listen_options *** #}
+{% if item.listen_options|default(false) %}
+{% set _listen_options = ' ' + item.listen_options %}
+{% else %}
+{% set _listen_options = '' %}
+{% endif %}
+{% if item.ipv6_listen_options|default(false) %}
+{% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
+{% else %}
+{% set _ipv6_listen_options = '' %}
+{% endif %}
+{# *** [END] set _listen_options *** #}
 
 server {
-{# Note: the value of nginx_listen_ip should be a list or a string #}
-{% if nginx_mailhost_listen_ip is not string and nginx_mailhost_listen_ip is iterable -%}
-{% for ip in nginx_mailhost_listen_ip %}
-  listen    {{ ip }}:{{ nginx_mailhost_listen_port }} {{ nginx_mailhost_listen_options|default('') }};
+{# Note: the value of item.listen_ip should be a list or a string #}
+{% if item.listen_ip|default('*') is not string and item.listen_ip is iterable %}
+{% for ip in item.listen_ip %}
+  listen {{ ip }}:{{ item.listen_port }}{{ _listen_options }};
 {% endfor %}
 {% else %}
-  listen    {{ nginx_mailhost_listen_ip|default('*') }}:{{ nginx_mailhost_listen_port }} {{ nginx_mailhost_listen_options|default('') }};
-{% endif -%}
-
+  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
+{% endif %}
 {# check to see if ipv6 support exists in the kernel before applying #}
-{% if nginx_mailhost_ipv6_enable and (ansible_default_ipv6.address is defined) -%}
-{# Note: the value of nginx_mailhost_ipv6_listen_ip should be a list or a string #}
-{% if nginx_mailhost_ipv6_listen_ip is not string and nginx_mailhost_ipv6_listen_ip is iterable -%}
-{% for ipv6 in nginx_mailhost_ipv6_listen_ip %}
-  listen [{{ ipv6 }}]:{{ nginx_mailhost_ipv6_listen_port }} {{ nginx_mailhost_ipv6_listen_options|default('') }};
+{% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) %}
+{# Note: the value of item.ipv6_listen_ip should be a list or a string #}
+{% if item.ipv6_listen_ip|default('::') is not string and item.ipv6_listen_ip is iterable %}
+{% for ipv6 in item.ipv6_listen_ip %}
+  listen [{{ ipv6 }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
 {% endfor %}
 {% else %}
-  listen [{{ nginx_mailhost_ipv6_listen_ip|default('::') }}]:{{ nginx_mailhost_ipv6_listen_port }} {{ nginx_mailhost_ipv6_listen_options|default('') }};
-{% endif -%}
-{% endif -%}
- 
-  server_name           {{ nginx_mailhost_server_name.join(" ") }};
-  protocol              {{ nginx_mailhost_protocol }};
-  xclient               {{ nginx_mailhost_xclient }};
-  auth_http             {{ nginx_mailhost_auth_http }};
-  starttls              {{ nginx_mailhost_starttls }};
+  listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
+{% endif %}
+{% endif %}
 
-{% if nginx_mailhost_starttls == 'on' or nginx_mailhost_starttls == 'only' -%}
-  ssl_certificate      {{ @ssl_cert }};
-  ssl_certificate_key  {{ @ssl_key }};
+  {# validate server_name is a list #}
+  server_name           {{ item.server_name|join(" ") }};
+  protocol              {{ item.protocol }};
+  xclient               {{ item.xclient }};
+  auth_http             {{ item.auth_http }};
+  starttls              {{ item.starttls }};
+
+{% if item.starttls == 'on' or item.starttls == 'only' %}
+  ssl_certificate      {{ item.ssl_cert }};
+  ssl_certificate_key  {{ item.ssl_key }};
 
   ssl_session_timeout  5m;
 
@@ -39,5 +51,5 @@ server {
   ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
 
   ssl_prefer_server_ciphers   on;
-{% endif -%}
+{% endif %}
 }
