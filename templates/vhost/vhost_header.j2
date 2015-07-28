@@ -146,9 +146,9 @@ server {
 {% endif %}
   }
 {% endif %}
-{% if item.index_files|default([])|count > 0 -%}
+{% if item.index_files|default([])|count > 0 %}
   index {{ item.index_files|join(' ') }};
-{% endif -%}
+{% endif %}
 {% if item.log_by_lua|default(false) %}
   log_by_lua '{{ item.log_by_lua }}';
 {% endif %}
@@ -179,4 +179,4 @@ server {
 {% else %}
   access_log            {{ _access_log }};
   error_log             {{ _error_log }};
-{% endif -%}
+{% endif %}
