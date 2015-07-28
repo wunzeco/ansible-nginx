@@ -75,5 +75,7 @@
 ### POST vhost.yml
 
 - include: map.yml
+  when: config_nginx_map
 
 - include: geo.yml
+  when: config_nginx_geo

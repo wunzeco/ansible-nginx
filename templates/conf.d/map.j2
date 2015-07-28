@@ -1,15 +1,15 @@
-map {{ nginx_map_string }} ${{ nginx_map_name }} {
-{% if nginx_map_hostnames -%}
+map {{ item.string }} ${{ item.name }} {
+{% if item.hostnames|default(false) %}
   hostnames;
-{% endif -%}
-{% if nginx_map_default -%}
-  default {{ nginx_map_default }};
-{% endif -%}
+{% endif %}
+{% if item.default|default(false) %}
+  default {{ item.default }};
+{% endif %}
 
-{% if nginx_mappings -%}
-{% set field_width = nginx_mappings.keys()|map('length')|max %}
-{% for key,value in nginx_mappings|dictsort %}
+{% if item.mappings|default(false) %}
+{% set field_width = item.mappings.keys()|map('length')|max %}
+{% for key,value in item.mappings|dictsort %}
   {{ key.ljust(field_width) }} {{ value }};
 {% endfor %}
-{% endif -%}
+{% endif %}
 }
