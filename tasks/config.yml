@@ -79,4 +79,7 @@
 - name: Delete nginx mail temp directory
   file: path={{ nginx_temp_dir }}/nginx.mail.d state=absent
 
-- include: resource/location.yml
+- include: resource/vhost.yml
+
+- include: resource/upstream.yml
+  when: config_nginx_upstream

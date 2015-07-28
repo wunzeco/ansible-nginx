@@ -141,6 +141,7 @@ nginx_geo:
 ##       '192.168.0.0/16':  'intra'
 ### END Geo ###
 
+
 ### START Map ###
 config_nginx_map:     false
 nginx_map:
@@ -160,8 +161,8 @@ nginx_map:
 ##     mappings:
 ##       '*.nyc.example.com': 'ny-pool-1'
 ##       '*.sf.example.com': 'sf-pool-1'
-
 ### END Map ###
+
 
 ### START Mailhost ###
 config_nginx_mailhost:              false
@@ -186,10 +187,24 @@ nginx_mailhost_server_name:         [ "{{ nginx_mailhost_name }}" ]  # list of m
 
 ### START Upstream ###
 config_nginx_upstream:  false
-nginx_upstream_name:
-nginx_upstream_members: []
-nginx_upstream_cfg_prepend:  {}
-nginx_upstream_fail_timeout: '10s'
+nginx_upstream: 
+  - name: proxypass
+    members: []
+    upstream_cfg_prepend: {}
+    upstream_fail_timeout: '10s'
+
+## Example: nginx_upstream
+## config_nginx_upstream:  true
+## nginx_upstream: 
+##   - name: proxypass
+##     members: 
+##       - 'localhost:3000'
+##       - 'localhost:3001'
+##       - 'localhost:3002'
+##     upstream_cfg_prepend: 
+##       ip_hash:    ''
+##       keepalive:  20
+##     upstream_fail_timeout: '10s'
 ### END Upstream ###
 
 ### START Location ###
@@ -312,7 +327,7 @@ nginx_location:
 ### END Location ###
 
 
-### START Vhost ###
+### START vHost ###
 nginx_vhost:
   - vhost:                         myvhost.internal
     enable:                        true
@@ -406,4 +421,4 @@ nginx_vhost:
     mode:                          "{{ nginx_global_mode }}"
     maintenance:                   false
     maintenance_value:             'return 503'
-### END Vhost ###
+### END vHost ###
