@@ -1,11 +1,11 @@
-{% if nginx_include_files %}
-{% for file in nginx_include_files %}
+{% if item.include_files %}
+{% for file in item.include_files %}
   include {{ file }};
 {% endfor %}
 {% end -%}
 
-{% if nginx_vhost_cfg_append -%}
-{% for key,value in nginx_vhost_cfg_append|dictsort %}
+{% if item.vhost_cfg_append -%}
+{% for key,value in item.vhost_cfg_append|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
@@ -17,8 +17,8 @@
 {% endfor %}
 {% endif -%}
 
-{% if nginx_vhost_cfg_ssl_append -%}
-{% for key,value in nginx_vhost_cfg_ssl_append|dictsort %}
+{% if item.vhost_cfg_ssl_append -%}
+{% for key,value in item.vhost_cfg_ssl_append|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
@@ -30,7 +30,7 @@
 {% endfor %}
 {% endif -%}
 
-{% for line in nginx_raw_append -%}
+{% for line in item.raw_append -%}
   {{ line }}
 {% endfor -%}
 }
