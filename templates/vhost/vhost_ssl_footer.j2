@@ -1,10 +1,10 @@
-{% if item.include_files %}
+{% if item.include_files|default(false) %}
 {% for file in item.include_files %}
   include {{ file }};
 {% endfor %}
-{% end -%}
+{% endif %}
 
-{% if item.vhost_cfg_append -%}
+{% if item.vhost_cfg_append|default(false) %}
 {% for key,value in item.vhost_cfg_append|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
@@ -15,9 +15,9 @@
   {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif -%}
+{% endif %}
 
-{% if item.vhost_cfg_ssl_append -%}
+{% if item.vhost_cfg_ssl_append|default(false) %}
 {% for key,value in item.vhost_cfg_ssl_append|dictsort %}
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
@@ -28,9 +28,11 @@
   {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif -%}
+{% endif %}
 
-{% for line in item.raw_append -%}
+{% if item.raw_append|default(false) and item.raw_append is iterable%}
+{% for line in item.raw_append %}
   {{ line }}
-{% endfor -%}
+{% endfor %}
+{% endif %}
 }
