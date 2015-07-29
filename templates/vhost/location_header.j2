@@ -31,10 +31,10 @@
 {# NOTE: value may only be a string or a list #}
 {% if value is not string and value is iterable%}
 {% for asubvalue in value %}
-    {{ key }} {{ asubvalue }};
+    {{ key }} {{ asubvalue }}
 {% endfor %}
 {% else %}
-    {{ key }} {{ value }};
+    {{ key }} {{ value }}
 {% endif %}
 {% endfor %}
 {% endif %}
