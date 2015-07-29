@@ -1,7 +1,7 @@
 {% include 'location_header.j2' %}
 
 {% if item.location_alias|default(false) %}
-{% include 'locations/alias.j2' %}
+{% include 'locations/alias.j2' ignore missing %}
 {% endif %}
 
 {% if item.stub_status|default(false) %}
