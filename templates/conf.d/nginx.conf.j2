@@ -50,7 +50,7 @@ http {
 {% endif %}
 {% endif %}
 
-  server_tokens {{ nginx_server_tokens }};
+  server_tokens {{ nginx_server_tokens|string }};
   types_hash_max_size    {{ nginx_types_hash_max_size }};
   types_hash_bucket_size {{ nginx_types_hash_bucket_size }};
 
@@ -58,7 +58,7 @@ http {
   server_names_hash_max_size    {{ nginx_names_hash_max_size }};
 
   keepalive_timeout  {{ nginx_keepalive_timeout }};
-  tcp_nodelay        {{ nginx_http_tcp_nodelay }};
+  tcp_nodelay        {{ nginx_http_tcp_nodelay|string }};
 
 {% if nginx_gzip == 'on' %}
   gzip              on;
@@ -72,14 +72,14 @@ http {
   gzip_min_length   {{ nginx_gzip_min_length }};
   gzip_http_version {{ nginx_gzip_http_version }};
 {% if nginx_gzip_proxied %}
-  gzip_proxied      {{ nginx_gzip_proxied }};
+  gzip_proxied      {{ nginx_gzip_proxied|string }};
 {% endif %}
 {% if nginx_gzip_types is not string and nginx_gzip_types is iterable %}
   gzip_types        "{{ nginx_gzip_types|join(' ') }}";
 {% else %}
   gzip_types        {{ nginx_gzip_types }};
 {% endif %}
-  gzip_vary         {{ nginx_gzip_vary }};
+  gzip_vary         {{ nginx_gzip_vary|string }};
 {% endif %}
 
 {% if nginx_client_body_temp_path %}
@@ -93,7 +93,7 @@ http {
 {% endif %}
 
 {% if nginx_proxy_redirect %}
-  proxy_redirect          {{ nginx_proxy_redirect }};
+  proxy_redirect          {{ nginx_proxy_redirect|string }};
 {% endif %}
 {% if nginx_proxy_temp_path %}
   proxy_temp_path         {{ nginx_proxy_temp_path }};
