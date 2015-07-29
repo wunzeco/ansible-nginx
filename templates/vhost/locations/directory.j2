@@ -5,8 +5,12 @@
 
     autoindex {{ item.autoindex }};
 {% endif %}
-{% if item.index_files %}
+{% if item.index_files|default(false) %}
     index    {{ item.index_files|join(' ') }};
+{% elif item.index_files is defined and item.index_files|count == 0 %}
+{# index_files is empty so do nothing #}
+{% else %}
+    index    {{ nginx_index_files|join(' ') }};
 {% endif %}
 {% if item.try_files|default(false) %}
     try_files {{ item.try_files|join(' ') }};
