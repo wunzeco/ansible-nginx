@@ -4,5 +4,5 @@
 {% if item.try_files|default(false) %}
     try_files {{ item.try_files|join(' ') }};
 {% endif %}
-    include {{ item.uwsgi_params_file }};
+    include {{ item.uwsgi_params_file|default(nginx_uwsgi_params_file) }};
     uwsgi_pass {{ item.uwsgi_pass }};
