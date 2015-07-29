@@ -1,7 +1,9 @@
     proxy_pass            {{ item.proxy_pass }};
-    proxy_read_timeout    {{ item.proxy_read_timeout }};
-    proxy_connect_timeout {{ item.proxy_connect_timeout }};
+    proxy_read_timeout    {{ item.proxy_read_timeout|default(nginx_proxy_read_timeout) }};
+    proxy_connect_timeout {{ item.proxy_connect_timeout|default(nginx_proxy_connect_timeout) }};
+{% if item.proxy_redirect|default(false) %}
     proxy_redirect        {{ item.proxy_redirect }};
+{% endif %}
 {% if item.proxy_method|default(false) %}
     proxy_method          {{ item.proxy_method }};
 {% endif %}
