@@ -5,14 +5,14 @@
       _loc_fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.location.d"
       _vhost_fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.sites.d"
 
-- name: Validate nginx_location_vhost
+- name: Validate vhost variable for location config is defined
   fail: msg="Cannot create a location reference without attaching to a virtual host"
   when: item.vhost is not defined
   with_items: nginx_location
 
 - name: Validate nginx_location params
   fail: msg="Cannot create a location reference without a www_root, proxy, location_alias, fastcgi, uwsgi, stub_status, internal or location_custom_cfg defined"
-  when: (item.www_root is not defined) and (item.proxy_pass is not defined)
+  when: (item.www_root is not defined) and (item.proxy_pass is not defined) and
             (item.location_alias is not defined) and (item.stub_status is not defined)
                 (item.fastcgi_pass is not defined) and (item.uwsgi_pass is not defined)
                     (item.custom_cfg is not defined) and (item.internal is not defined)
@@ -23,33 +23,34 @@
   when: (item.www_root is defined and item.www_root) and (item.proxy_pass is defined and item.proxy_pass)
   with_items: nginx_location
 
-- name: Validate vhost name
+- name: Validate vhost name does not contain invalid characters
   fail: msg="Cannot have whitespace or '/' in vhost name"
-  when: item.vhost|search(' ')
+  when: item.vhost|search(' |/')
   with_items: nginx_location
 
-- name: Create nginx location config fragments dir
-  file: path={{ _loc_fragments_dir }} state=directory
+#- name: Create nginx location config fragments dir
+#  file: path={{ _loc_fragments_dir }} state=directory
+#
+#- name: Create nginx location config fragments sub directories
+#  file: path={{ _loc_fragments_dir }}/{{ item.vhost }} state=directory
+#  with_items: nginx_location
 
-- name: Create nginx location config fragments sub directories
-  file: path={{ _loc_fragments_dir }}/{{ item.vhost }} state=directory
-  with_items: nginx_location
-
+# Consider moving fastcgi and uwsgi_params files tasks to config.yml
 - name: Create nginx fastcgi params conf file
   template: src=../../templates/vhost/fastcgi_params.j2 dest={{ nginx_fastcgi_params_file }} owner=root group=root mode=0644
-  when: item.fastcgi_pass
+  when: item.fastcgi_pass|default(false)
   with_items: nginx_location
 
 - name: Create nginx uwsgi params conf file
-  template: src=../../templates/vhost/uwsgi_params.j2 dest={{ item.uwsgi_params_file }} owner=root group=root mode=0644
-  when: item.uwsgi_pass
+  template: src=../../templates/vhost/uwsgi_params.j2 dest={{ nginx_uwsgi_params_file }} owner=root group=root mode=0644
+  when: item.uwsgi_pass|default(false)
   with_items: nginx_location
 
 - name: Create nginx location config for non-ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-location owner=root group=root mode=0644
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
   with_items: nginx_location
 
 - name: Create nginx location config for ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-location owner=root group=root mode=0644
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
   when: item.ssl
   with_items: nginx_location

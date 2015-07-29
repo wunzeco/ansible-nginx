@@ -9,12 +9,12 @@
 
 - name: Validate IPv6 kernel support exists if ipv6_enabled is true
   fail: msg="[nginx] IPv6 support is not enabled or configured properly"
-  when: item.ipv6_enable and not ansible_default_ipv6.address 
+  when: item.ipv6_enable|default(false) and not ansible_default_ipv6.address 
   with_items: nginx_vhost
 
 - name: Validate SSL certificate/key is defined
   fail: msg="[nginx] SSL certificate/key (ssl_cert/ssl_key) and/or SSL Private must be defined on the target system(s)"
-  when: item.ssl|default(false) and (item.ssl_cert is defined or item.ssl_key is defined)
+  when: item.ssl|default(false) and (item.ssl_cert is not defined or item.ssl_key is not defined)
   with_items: nginx_vhost
 
 - name: Validate vhost name
@@ -22,19 +22,16 @@
   when: item.vhost|search(' |/|_')
   with_items: nginx_location
 
-- name: Create nginx vhost config fragments dir
-  file: path={{ _vhost_fragments_dir }} state=directory
+#- name: Create nginx vhost config fragments dir
+#  file: path={{ _vhost_fragments_dir }} state=directory
 
-- name: Create nginx non-ssl vhost config fragments sub directories
-  file: path={{ _vhost_fragments_dir }}/{{ item.vhost }}/nonssl state=directory
-  with_items: nginx_vhost
-
-- name: Create nginx ssl vhost config fragments sub directories
-  file: path={{ _vhost_fragments_dir }}/{{ item.vhost }}/ssl state=directory
+- name: Create nginx vhost config fragments sub directories
+  file: path={{ _vhost_fragments_dir }}/{{ item.vhost }} state=directory
   with_items: nginx_vhost
 
 # Create nginx location config fragments
 - include: location.yml
+  when: config_nginx_location
 
 - name: Create nginx non-ssl vhost header config fragment 
   template: src=../../templates/vhost/vhost_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/001-nonssl-header.vhost owner=root group=root mode=0644
@@ -45,6 +42,8 @@
   template: src=../../templates/vhost/vhost_footer.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/699-nonssl-footer.vhost owner=root group=root mode=0644
   when: item.listen_port != item.ssl_port
   with_items: nginx_vhost
+
+- debug: msg="CHECKPOINT"
 
 - name: Create nginx ssl vhost header config fragment 
   template: src=../../templates/vhost/vhost_ssl_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/700-ssl-header.vhost owner=root group=root mode=0644
@@ -68,6 +67,7 @@
 
 - name: Enable nginx vhost config
   file: src={{ _vhost_dir }}/{{ item.vhost }}.conf dest={{ _vhost_enable_dir }}/{{ item.vhost }}.conf owner=root group=root state=link
+  when: item.enable|default(true)
   with_items: nginx_vhost
   notify: Restart nginx
 
