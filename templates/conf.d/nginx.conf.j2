@@ -67,7 +67,7 @@ http {
 {% endif %}
   gzip_comp_level   {{ nginx_gzip_comp_level }};
 {% if nginx_gzip_disable %}
-  gzip_disable      {{ nginx_gzip_disable }};
+  gzip_disable      "{{ nginx_gzip_disable }}";
 {% endif %}
   gzip_min_length   {{ nginx_gzip_min_length }};
   gzip_http_version {{ nginx_gzip_http_version }};
