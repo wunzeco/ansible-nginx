@@ -146,8 +146,12 @@ server {
 {% endif %}
   }
 {% endif %}
-{% if item.index_files|default([])|count > 0 %}
-  index {{ item.index_files|join(' ') }};
+{% if item.index_files|default(false) %}
+  index    {{ item.index_files|join(' ') }};
+{% elif item.index_files is defined and item.index_files|count == 0 %}
+{# index_files is empty so do nothing #}
+{% else %}
+  index    {{ nginx_index_files|join(' ') }};
 {% endif %}
 {% if item.log_by_lua|default(false) %}
   log_by_lua '{{ item.log_by_lua }}';
@@ -157,19 +161,18 @@ server {
 {% endif %}
 
 {# *** [START] set _access_log and _error_log *** #}
+{% set _access_log = item.vhost + '.access.log' %}
+{% set _ssl_access_log 	= 'ssl-' + item.vhost + '.access.log' %}
 {% if item.access_log is defined and item.access_log %}
 {% set _access_log 	= item.access_log %}
 {% set _ssl_access_log 	= 'ssl-' + item.access_log %}
-{% else %}
-{% set _access_log = item.vhost + '.access.log' %}
-{% set _ssl_access_log 	= 'ssl-' + item.vhost + '.access.log' %}
 {% endif %}
+
+{% set _error_log = item.vhost + '.error.log' %}
+{% set _ssl_error_log 	= 'ssl-' + item.vhost + '.error.log' %}
 {% if item.error_log is defined and item.error_log %}
 {% set _error_log 	= item.error_log %}
 {% set _ssl_error_log 	= 'ssl-' + item.error_log %}
-{% else %}
-{% set _error_log = item.vhost + '.error.log' %}
-{% set _ssl_error_log 	= 'ssl-' + item.vhost + '.error.log' %}
 {% endif %}
 {# *** [END] set _access_log and _error_log *** #}
 
