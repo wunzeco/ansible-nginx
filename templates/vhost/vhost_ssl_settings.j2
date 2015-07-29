@@ -1,39 +1,39 @@
   ssl on;
 
-  ssl_certificate           {{ nginx_ssl_cert }};
-  ssl_certificate_key       {{ nginx_ssl_key }};
-{% if nginx_ssl_client_cert is defined and nginx_ssl_client_cert -%}
-  ssl_client_certificate    {{ nginx_ssl_client_cert }};
+  ssl_certificate           {{ item.ssl_cert }};
+  ssl_certificate_key       {{ item.ssl_key }};
+{% if item.ssl_client_cert|default(false) %}
+  ssl_client_certificate    {{ item.ssl_client_cert }};
   ssl_verify_client on;
-{% end -%}
-{% if nginx_ssl_dhparam is defined and nginx_ssl_dhparam -%}
-  ssl_dhparam               {{ nginx_ssl_dhparam }};
-{% end -%}
-  ssl_session_cache         {{ nginx_ssl_cache }};
-  ssl_session_timeout       {{ nginx_ssl_session_timeout }};
-{% if nginx_ssl_buffer_size -%}
-  ssl_buffer_size           {{ nginx_ssl_buffer_size }};
-{% end -%}
-  ssl_protocols             {{ nginx_ssl_protocols }};
-  ssl_ciphers               {{ nginx_ssl_ciphers }};
+{% endif %}
+{% if item.ssl_dhparam|default(false) %}
+  ssl_dhparam               {{ item.ssl_dhparam }};
+{% endif %}
+  ssl_session_cache         {{ item.ssl_cache|default(nginx_ssl_cache) }};
+  ssl_session_timeout       {{ item.ssl_session_timeout|default(nginx_ssl_session_timeout) }};
+{% if item.ssl_buffer_size|default(false) %}
+  ssl_buffer_size           {{ item.ssl_buffer_size }};
+{% endif %}
+  ssl_protocols             {{ item.ssl_protocols|default(nginx_ssl_protocols) }};
+  ssl_ciphers               {{ item.ssl_ciphers|default(nginx_ssl_ciphers) }};
   ssl_prefer_server_ciphers on;
-{% if nginx_ssl_crl -%}
-  ssl_crl                   {{ nginx_ssl_crl }};
-{% end -%}
+{% if item.ssl_crl|default(false) %}
+  ssl_crl                   {{ item.ssl_crl }};
+{% endif %}
 
-{% if nginx_ssl_stapling is defined and nginx_ssl_stapling -%}
+{% if item.ssl_stapling|default(false) %}
   ssl_stapling              on;
-{% end -%}
-{% if nginx_ssl_stapling_file is defined and nginx_ssl_stapling_file -%}
-  ssl_stapling_file         {{ nginx_ssl_stapling_file }};
-{% end -%}
-{% if nginx_ssl_stapling_responder is defined and nginx_ssl_stapling_responder -%}
-  ssl_stapling_responder    {{ nginx_ssl_stapling_responder }};
-{% end -%}
-{% if nginx_ssl_stapling_verify|default(false) -%}
+{% endif %}
+{% if item.ssl_stapling_file|default(false) %}
+  ssl_stapling_file         {{ item.ssl_stapling_file }};
+{% endif %}
+{% if item.ssl_stapling_responder|default(false) %}
+  ssl_stapling_responder    {{ item.ssl_stapling_responder }};
+{% endif %}
+{% if item.ssl_stapling_verify|default(false) -%}
   ssl_stapling_verify       on;
-{% end -%}
-{% if nginx_ssl_trusted_cert is defined and nginx_ssl_trusted_cert -%}
-  ssl_trusted_certificate   {{ nginx_ssl_trusted_cert }};
-{% end -%}
+{% endif %}
+{% if item.ssl_trusted_cert|default(false) %}
+  ssl_trusted_certificate   {{ item.ssl_trusted_cert }};
+{% endif %}
 
