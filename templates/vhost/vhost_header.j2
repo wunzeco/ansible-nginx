@@ -3,13 +3,14 @@
 {% set _listen_options = ' ' + item.listen_options %}
 {% else %}
 {% set _listen_options = '' %}
-{% endif %}
+{% endif -%}
+
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
 {% else %}
 {% set _ipv6_listen_options = '' %}
 {% endif %}
-{# *** [END] set _listen_options *** #}
+{# *** [END] set _listen_options *** -#}
 
 {% if item.rewrite_www_to_non_www|default(false) %}
 server {
@@ -46,7 +47,7 @@ server {
 {% endfor %}
 {% else %}
   listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
-{% endif %}
+{% endif -%}
 
 {# check to see if ipv6 support exists in the kernel before applying #}
 {% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) -%}
@@ -58,19 +59,23 @@ server {
 {% else %}
   listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
 {% endif %}
-{% endif %}
+{% endif -%}
 
+{# *** [START] set _server_name *** #}
+{% set _server_name = item.server_name|default([item.vhost])|join(" ") %}
 {% if item.rewrite_www_to_non_www|default(false) %}
-  server_name           {{ item.server_name[0]|regex_replace('^www.', '') }};
-{% else %}
-  server_name           {{ item.server_name|join(" ") }};
-{% endif %}
+{% set _server_name = _server_name[0]|regex_replace('^www.', '') %};
+{% endif -%}
+{# *** [END] set _server_name *** #}
+
+  server_name  {{ _server_name }};
+
 {% if item.auth_basic|default(false) %}
   auth_basic           "{{ item.auth_basic }}";
 {% endif %}
 {% if item.auth_basic_user_file|default(false) %}
   auth_basic_user_file {{ item.auth_basic_user_file }};
-{% endif %}
+{% endif -%}
 
 {% if item.client_body_timeout|default(false) %}
   client_body_timeout {{ item.client_body_timeout }};
@@ -84,7 +89,7 @@ server {
 
 {% if item.gzip_types|default(false) %}
   gzip_types {{ item.gzip_types }};
-{% endif %}
+{% endif -%}
 
 {# make sure that allow comes before deny by forcing the allow key (if it #}
 {# exists) to be first in the output order.  The hash keys also need to be #}
@@ -110,7 +115,8 @@ server {
 
 {% if item.www_root|default(false) %}
   root {{ item.www_root }};
-{% endif %}
+{% endif -%}
+
 {% if item.passenger_cgi_param|default(false) %}
 {% for key,value in item.passenger_cgi_param|dictsort %}
   passenger_set_cgi_param  {{ key }} {{ value }};
@@ -125,7 +131,8 @@ server {
 {% for key,value in item.passenger_env_var|dictsort %}
   passenger_env_var  {{ key }} {{ value }};
 {% endfor %}
-{% endif %}
+{% endif -%}
+
 {% if item.resolver|default([])|count > 0 %}
   resolver                  {{ item.resolver|join(' ') }};
 {% endif %}
@@ -136,7 +143,8 @@ server {
 {% endif %}
 {% if item.maintenance|default(false) %}
   {{ item.maintenance_value }};
-{% endif %}
+{% endif -%}
+
 {% if item.rewrite_to_https|default(false) %}
   if ($ssl_protocol = "") {
 {% if item.ssl_port|default(false) != 443 %}
@@ -145,7 +153,8 @@ server {
        return 301 https://$host$request_uri;
 {% endif %}
   }
-{% endif %}
+{% endif -%}
+
 {% if item.index_files|default(false) %}
   index    {{ item.index_files|join(' ') }};
 {% elif item.index_files is defined and item.index_files|count == 0 %}
@@ -153,12 +162,13 @@ server {
 {% else %}
   index    {{ nginx_index_files|join(' ') }};
 {% endif %}
+
 {% if item.log_by_lua|default(false) %}
   log_by_lua '{{ item.log_by_lua }}';
 {% endif %}
 {% if item.log_by_lua_file|default(false) %}
   log_by_lua_file "{{ item.log_by_lua_file }}";
-{% endif %}
+{% endif -%}
 
 {# *** [START] set _access_log and _error_log *** #}
 {% set _access_log = item.vhost + '.access.log' %}
@@ -166,7 +176,7 @@ server {
 {% if item.access_log is defined and item.access_log %}
 {% set _access_log 	= item.access_log %}
 {% set _ssl_access_log 	= 'ssl-' + item.access_log %}
-{% endif %}
+{% endif -%}
 
 {% set _error_log = item.vhost + '.error.log' %}
 {% set _ssl_error_log 	= 'ssl-' + item.vhost + '.error.log' %}
@@ -174,7 +184,7 @@ server {
 {% set _error_log 	= item.error_log %}
 {% set _ssl_error_log 	= 'ssl-' + item.error_log %}
 {% endif %}
-{# *** [END] set _access_log and _error_log *** #}
+{# *** [END] set _access_log and _error_log *** -#}
 
 {% if item.ssl|default(false) %}
   access_log            {{ _ssl_access_log }};

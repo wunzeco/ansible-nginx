@@ -19,7 +19,7 @@
   ssl_prefer_server_ciphers on;
 {% if item.ssl_crl|default(false) %}
   ssl_crl                   {{ item.ssl_crl }};
-{% endif %}
+{% endif -%}
 
 {% if item.ssl_stapling|default(false) %}
   ssl_stapling              on;
@@ -36,4 +36,3 @@
 {% if item.ssl_trusted_cert|default(false) %}
   ssl_trusted_certificate   {{ item.ssl_trusted_cert }};
 {% endif %}
-

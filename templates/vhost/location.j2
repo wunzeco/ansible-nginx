@@ -1,33 +1,33 @@
-{% include 'location_header.j2' %}
+{% include 'location_header.j2' -%}
 
 {% if item.location_alias|default(false) %}
 {% include 'locations/alias.j2' ignore missing %}
-{% endif %}
+{% endif -%}
 
 {% if item.stub_status|default(false) %}
 {% include 'locations/stub_status.j2' %}
-{% endif %}
+{% endif -%}
 
 {% if item.proxy_pass|default(false) %}
 {% include 'locations/proxy.j2' %}
-{% endif %}
+{% endif -%}
 
 {% if item.fastcgi_pass|default(false) %}
 {% include 'locations/fastcgi.j2' %}
-{% endif %}
+{% endif -%}
 
 {% if item.uwsgi_pass|default(false) %}
 {% include 'locations/uwsgi.j2' %}
-{% endif %}
+{% endif -%}
 
 {% if item.www_root|default(false) %}
 {% include 'locations/directory.j2' %}
-{% endif %}
+{% endif -%}
 
 {% if not (item.proxy|default(false) or item.location_alias|default(false) or 
 	   item.stub_status|default(false) or item.fastcgi|default(false) or 
 	   item.uwsgi|default(false) or item.www_root|default(false)) %}
 {% include 'locations/empty.j2' %}
-{% endif %}
+{% endif -%}
 
-{% include 'location_footer.j2' %}
+{% include 'location_footer.j2' -%}

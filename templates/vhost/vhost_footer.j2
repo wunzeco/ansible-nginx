@@ -15,7 +15,7 @@
   {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.location_raw_append|default(false) and item.location_raw_append is iterable%}
 {% for line in item.location_raw_append %}

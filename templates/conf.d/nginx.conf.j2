@@ -37,7 +37,7 @@ events {
 http {
   include       {{ nginx_conf_dir }}/mime.types;
   default_type  application/octet-stream;
-{% if nginx_log_format -%}
+{% if nginx_log_format %}
 {% for key,value in nginx_log_format|dictsort %}
   log_format {{ key }} '{{ value }}';
 {% endfor %}
@@ -124,8 +124,8 @@ http {
 {% endif %}
 {% if nginx_proxy_cache_path %}
   proxy_cache_path        {{ nginx_proxy_cache_path }} levels={{ nginx_proxy_cache_levels }} keys_zone={{ nginx_proxy_cache_keys_zone }} max_size={{ nginx_proxy_cache_max_size }} inactive={{ nginx_proxy_cache_inactive }};
-
 {% endif %}
+
 {% if nginx_fastcgi_cache_path %}
   fastcgi_cache_path    	{{ nginx_fastcgi_cache_path }} levels={{ nginx_fastcgi_cache_levels }} keys_zone={{ nginx_fastcgi_cache_keys_zone }} max_size={{ nginx_fastcgi_cache_max_size }} inactive={{ nginx_fastcgi_cache_inactive }};
 {% endif %}

@@ -4,7 +4,7 @@
     include       {{ item.fastcgi_params_file|default(nginx_fastcgi_params_file) }};
 {% if nginx_try_files|default(false) %}
     try_files    {{ item.try_files|join(' ') }};
-{% endif %}
+{% endif -%}
 
     fastcgi_pass  {{ item.fastcgi_pass }};
 {% if item.fastcgi_split_path|default(false) %}

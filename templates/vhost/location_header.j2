@@ -24,7 +24,7 @@
 {% endif %}
 {% if item.auth_basic_user_file|default(false) %}
     auth_basic_user_file {{ item.auth_basic_user_file }};
-{% endif %}
+{% endif -%}
 
 {% if item.location_custom_cfg_prepend|default(false) %}
 {% for key,value in item.location_custom_cfg_prepend.iteritems() %}
@@ -37,7 +37,7 @@
     {{ key }} {{ value }}
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.location_cfg_prepend|default(false) -%}
 {% for key,value in item.location_cfg_prepend|dictsort %}
@@ -50,16 +50,16 @@
     {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.raw_prepend|default(false) and item.raw_prepend|default([])|count > 0 %}
 {% for line in item.raw_prepend %}
     {{ line }}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.rewrite_rules|default(false) or item.rewrite_rules|default([])|count > 0 %}
 {% for rewrite_rule in item.rewrite_rules %}
     rewrite {{ rewrite_rule }}
 {% endfor %}
-{% endif %}
+{% endif -%}

@@ -9,7 +9,7 @@
     {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.location_custom_cfg_append|default(false) %}
 {% for key,value in item.location_custom_cfg_append.iteritems() %}
@@ -27,7 +27,7 @@
 {% for line in item.raw_append %}
     {{ line }}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.include|default(false) %}
 {% for include_file in item.include %}

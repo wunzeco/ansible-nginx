@@ -8,7 +8,7 @@
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
 {% endif -%}
-{# *** [END] set _listen_options *** #}
+{# *** [END] set _listen_options *** -#}
 
 {# *** [START] set _ssl and _spdy *** #}
 {% set _ssl_listen_option = '' %}
@@ -20,9 +20,9 @@
 {% if item.spdy|default(false) %}
 {% set _spdy_listen_option = ' spdy' %}
 {% endif -%}
-{# *** [END] set _ssl and _spdy *** #}
+{# *** [END] set _ssl and _spdy *** -#}
 
-{# WARNING: This file needs refactoring to address scope.function_template lines #}
+{# WARNING: This file needs refactoring to address scope.function_template lines -#}
 
 {% if item.rewrite_www_to_non_www|default(false) %}
 server {
@@ -51,7 +51,7 @@ server {
 {% endif %}
   return       301 https://{{ item.server_name[0]|regex_replace('^www.', '') }}$request_uri;
 
-{% include 'vhost_ssl_settings.j2' ignore missing %}
+{% include 'vhost_ssl_settings.j2' %}
 
 }
 
@@ -65,7 +65,7 @@ server {
 {% endfor %}
 {% else %}
   listen  {{ item.listen_ip|default('*') }}:{{ item.ssl_port }}{{ _ssl_listen_option }}{{ _spdy_listen_option }}{{ _listen_options }};
-{% endif %}
+{% endif -%}
 
 {# check to see if ipv6 support exists in the kernel before applying #}
 {% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) -%}
@@ -77,46 +77,47 @@ server {
 {% else %}
   listen  [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ssl_port }} ssl{{ _spdy_listen_option }}{{ _ipv6_listen_options }};
 {% endif %}
-{% endif %}
-{% if item.server_name|default(false) %}
-{% if item.rewrite_www_to_non_www|default(false) %}
-  server_name  {{ item.server_name[0]|regex_replace('^www.', '') }};
-{% else %}
-  server_name  {{ item.server_name|join(" ") }};
-{% endif %}
-{% endif %}
+{% endif -%}
 
-{% include 'vhost_ssl_settings.j2' ignore missing %}
+{# *** [START] set _server_name *** #}
+{% set _server_name = item.server_name|default([item.vhost])|join(" ") %}
+{% if item.rewrite_www_to_non_www|default(false) %}
+{% set _server_name = _server_name[0]|regex_replace('^www.', '') %};
+{% endif -%}
+{# *** [END] set _server_name *** #}
+
+  server_name  {{ _server_name }};
+
+{% include 'vhost_ssl_settings.j2' %}
 
 {% if item.maintenance|default(false) %}
   {{ item.maintenance_value }};
-{% endif %}
-
+{% endif -%}
 
 {% if item.resolver|default([])|count > 0 %}
   resolver             {{ item.resolver|join(' ') }};
-{% endif %}
+{% endif -%}
 
 {% if item.auth_basic|default(false) %}
   auth_basic           "{{ item.auth_basic }}";
-{% endif %}
+{% endif -%}
 {% if item.auth_basic_user_file|default(false) %}
   auth_basic_user_file      {{ item.auth_basic_user_file }};
-{% endif %}
+{% endif -%}
 
 {% if item.client_body_timeout|default(false) %}
   client_body_timeout {{ item.client_body_timeout }};
-{% endif %}
+{% endif -%}
 {% if item.client_header_timeout|default(false) %}
   client_header_timeout {{ item.client_header_timeout }};
-{% endif %}
+{% endif -%}
 {% if item.client_max_body_size|default(false) %}
   client_max_body_size {{ item.client_max_body_size }};
 {% endif %}
 
 {% if item.gzip_types|default(false) %}
   gzip_types {{ item.gzip_types }};
-{% endif %}
+{% endif -%}
 
 {% if item.index_files|default(false) %}
   index    {{ item.index_files|join(' ') }};
@@ -124,13 +125,13 @@ server {
 {# index_files is empty so do nothing #}
 {% else %}
   index    {{ nginx_index_files|join(' ') }};
-{% endif %}
+{% endif -%}
 
 {# *** [START] set _access_log and _error_log *** #}
 {% set _ssl_access_log  = 'ssl-' + item.vhost + '.access.log' %}
 {% if item.access_log is defined and item.access_log %}
 {% set _ssl_access_log  = 'ssl-' + item.access_log %}
-{% endif %}
+{% endif -%}
 
 {% set _ssl_error_log   = 'ssl-' + item.vhost + '.error.log' %}
 {% if item.error_log is defined and item.error_log %}
@@ -152,7 +153,7 @@ server {
   {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.vhost_cfg_ssl_prepend|default(false) %}
 {% for key,value in item.vhost_cfg_ssl_prepend|dictsort %}
@@ -165,7 +166,7 @@ server {
   {{ key }} {{ value }};
 {% endif %}
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.raw_prepend|default(false) and item.raw_prepend is iterable %}
 {% for line in item.raw_prepend %}
@@ -175,7 +176,8 @@ server {
 
 {% if item.www_root|default(false) -%}
   root {{ item.www_root }};
-{% endif %}
+{% endif -%}
+
 {% if item.passenger_cgi_param|default(false) %}
 {% for key,value in item.passenger_cgi_param|dictsort %}
   passenger_set_cgi_param  {{ key }} {{ value }};
@@ -190,7 +192,7 @@ server {
 {% for key,value in item.passenger_env_var|dictsort %}
   passenger_env_var  {{ key }} {{ value }};
 {% endfor %}
-{% endif %}
+{% endif -%}
 
 {% if item.add_header|default(false) %}
 {% for key,value in item.add_header|dictsort %}
