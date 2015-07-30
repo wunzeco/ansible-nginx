@@ -1,5 +1,5 @@
 {% if nginx_super_user %}
-user {{ nginx_user }};
+user {{ nginx_daemon_user }};
 {% endif %}
 worker_processes {{ nginx_worker_processes }};
 {% if nginx_worker_rlimit_nofile %}
