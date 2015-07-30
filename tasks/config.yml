@@ -6,22 +6,25 @@
 - name: Create nginx conf directory
   file: path={{ nginx_conf_dir }} owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
 
-- name: Delete nginx conf directory
+- name: Delete nginx conf.d directory
   file: path={{ nginx_conf_dir }}/conf.d state=absent
   when: nginx_confd_purge
+
+- name: Create nginx conf.d directory
+  file: path={{ nginx_conf_dir }}/conf.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
   notify: 
     - Validate nginx config
     - Restart nginx
 
-- name: Create nginx conf.d directory
-  file: path={{ nginx_conf_dir }}/conf.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
-
-- name: Delete nginx mail conf directory
+- name: Delete nginx mail conf.d directory
   file: path={{ nginx_conf_dir }}/conf.mail.d state=absent
   when: nginx_confd_purge
 
-- name: Create nginx conf.d directory
+- name: Create nginx mail conf.d directory
   file: path={{ nginx_conf_dir }}/conf.mail.d owner={{ nginx_global_owner }} group={{ nginx_global_group }} mode=0755 state=directory
+  notify: 
+    - Validate nginx config
+    - Restart nginx
 
 - name: Delete nginx vhost_autogen.conf file in conf.d
   file: path={{ nginx_conf_dir }}/conf.d/vhost_autogen.conf state=absent
@@ -80,6 +83,7 @@
   file: path={{ nginx_temp_dir }}/nginx.mail.d state=absent
 
 - include: resource/vhost.yml
+  when: config_nginx_vhost
 
 - include: resource/upstream.yml
   when: config_nginx_upstream
