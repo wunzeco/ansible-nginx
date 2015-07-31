@@ -61,9 +61,6 @@
   with_items: nginx_vhost
   notify: Restart nginx
 
-- include: mailhost.yml
-  when: config_nginx_mailhost
-
 - include: map.yml
   when: config_nginx_map
 
