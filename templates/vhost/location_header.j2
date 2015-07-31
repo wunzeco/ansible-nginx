@@ -1,5 +1,12 @@
+{# *** [START] set _location *** #}
+{% if item.use_default_location|default(false) %}
+{% set _location = '/' %}
+{% else %}
+{% set _location = item.location %}
+{% endif %}
+{# *** [END] set _location *** #}
 
-  location {{ item.location }} {
+  location {{ _location }} {
 {% if item.internal|default(false) %}
     internal;
 {% endif %}

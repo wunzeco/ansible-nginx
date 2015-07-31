@@ -22,8 +22,8 @@
   with_items: nginx_location
 
 - name: Validate vhost name does not contain invalid characters
-  fail: msg="Cannot have whitespace or '/' in vhost name"
-  when: item.vhost|search(' |/')
+  fail: msg="Cannot have whitespace, '/' or '_' characters in vhost name"
+  when: item.vhost|search(' |/|_')
   with_items: nginx_location
 
 # Consider moving fastcgi and uwsgi_params files tasks to config.yml
@@ -38,11 +38,22 @@
   with_items: nginx_location
 
 - name: Create nginx location config for non-ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/410-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
   when: not item.ssl|default(false) and item.listen_port != item.ssl_port|default(false)
   with_items: nginx_location
 
 - name: Create nginx location config for ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/810-ssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
   when: item.ssl|default(false)
   with_items: nginx_location
+
+## Configure default location '/' for each vhost with use_default_location attribute enabled
+- name: Create nginx default location config for non-ssl vhost
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-default.location owner=root group=root mode=0644
+  when: item.use_default_location and not item.ssl|default(false)
+  with_items: nginx_vhost
+
+- name: Create nginx default location config for ssl vhost
+  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-default.location owner=root group=root mode=0644
+  when: item.use_default_location and item.ssl|default(false)
+  with_items: nginx_vhost

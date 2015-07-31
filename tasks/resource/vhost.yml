@@ -19,9 +19,14 @@
   with_items: nginx_vhost
 
 - name: Validate vhost name
-  fail: msg="Cannot have whitespace or '/' in vhost name"
+  fail: msg="Cannot have whitespace, '/' or '_' characters in vhost name"
   when: item.vhost|search(' |/|_')
-  with_items: nginx_location
+  with_items: nginx_vhost
+
+- name: Validate use_default_location attribute for each vhost config object is defined
+  fail: msg="use_default_location attribute is mandatory for each vhost defined"
+  when: item.use_default_location is not defined
+  with_items: nginx_vhost
 
 - name: Create nginx vhost config fragments sub directories
   file: path={{ _vhost_fragments_dir }}/{{ item.vhost }} state=directory
