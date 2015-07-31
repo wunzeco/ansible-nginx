@@ -1,25 +1,24 @@
 {# *** [START] set _listen_options *** #}
+{% set _listen_options = '' %}
 {% if item.listen_options|default(false) %}
 {% set _listen_options = ' ' + item.listen_options %}
-{% else %}
-{% set _listen_options = '' %}
-{% endif %}
+{% endif -%}
+
+{% set _ipv6_listen_options = 'default ipv6only=on' %}
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
-{% else %}
-{% set _ipv6_listen_options = '' %}
-{% endif %}
-{# *** [END] set _listen_options *** #}
+{% endif -%}
+{# *** [END] set _listen_options *** -#}
 
 server {
 {# Note: the value of item.listen_ip should be a list or a string #}
 {% if item.listen_ip|default('*') is not string and item.listen_ip is iterable %}
 {% for ip in item.listen_ip %}
-  listen {{ ip }}:{{ item.listen_port }};
+  listen {{ ip }}:{{ item.ssl_port }};
 {% endfor %}
 {% else %}
-  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
-{% endif %}
+  listen {{ item.listen_ip|default('*') }}:{{ item.ssl_port }}{{ _listen_options }};
+{% endif -%}
 
 {# check to see if ipv6 support exists in the kernel before applying #}
 {% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) %}
@@ -33,10 +32,12 @@ server {
 {% endif %}
 {% endif %}
 
-  server_name           {{ item.server_name|join(" ") }};
-  protocol              {{ item.protocol }};
-  xclient               {{ item.xclient }};
+  server_name  		{{ item.server_name|default([item.vhost])|join(" ") }};
+  protocol              {{ item.protocol|default('smtp') }};
+  xclient               {{ item.xclient|default('on') }};
+{% if item.auth_http|default(false) %}
   auth_http             {{ item.auth_http }};
+{% endif %}
 
   ssl on;
   ssl_certificate      {{ item.ssl_cert }};

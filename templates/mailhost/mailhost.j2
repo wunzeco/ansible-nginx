@@ -1,15 +1,14 @@
 {# *** [START] set _listen_options *** #}
+{% set _listen_options = '' %}
 {% if item.listen_options|default(false) %}
 {% set _listen_options = ' ' + item.listen_options %}
-{% else %}
-{% set _listen_options = '' %}
-{% endif %}
+{% endif -%}
+
+{% set _ipv6_listen_options = 'default ipv6only=on' %}
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
-{% else %}
-{% set _ipv6_listen_options = '' %}
-{% endif %}
-{# *** [END] set _listen_options *** #}
+{% endif -%}
+{# *** [END] set _listen_options *** -#}
 
 server {
 {# Note: the value of item.listen_ip should be a list or a string #}
@@ -19,7 +18,8 @@ server {
 {% endfor %}
 {% else %}
   listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
-{% endif %}
+{% endif -%}
+
 {# check to see if ipv6 support exists in the kernel before applying #}
 {% if item.ipv6_enable|default(false) and (ansible_default_ipv6.address is defined) %}
 {# Note: the value of item.ipv6_listen_ip should be a list or a string #}
@@ -32,14 +32,15 @@ server {
 {% endif %}
 {% endif %}
 
-  {# validate server_name is a list #}
-  server_name           {{ item.server_name|join(" ") }};
-  protocol              {{ item.protocol }};
-  xclient               {{ item.xclient }};
+  server_name  		{{ item.server_name|default([item.vhost])|join(" ") }};
+  protocol              {{ item.protocol|default('smtp') }};
+  xclient               {{ item.xclient|default('on') }};
+  starttls              {{ item.starttls|default('off') }};
+{% if item.auth_http|default(false) %}
   auth_http             {{ item.auth_http }};
-  starttls              {{ item.starttls }};
+{% endif %}
 
-{% if item.starttls == 'on' or item.starttls == 'only' %}
+{% if item.starttls|default(false) and (item.starttls == 'on' or item.starttls == 'only') %}
   ssl_certificate      {{ item.ssl_cert }};
   ssl_certificate_key  {{ item.ssl_key }};
 
@@ -53,3 +54,7 @@ server {
   ssl_prefer_server_ciphers   on;
 {% endif %}
 }
+
+{% if item.ssl|default(false) and item.listen_port != item.ssl_port|default(false) %}
+{% include 'mailhost_ssl.j2' %}
+{% endif %}

@@ -1,7 +1,5 @@
 ---
 
-# Do not forget to notify 'Restart nginx'
-
 - set_fact:
       _vhost_dir: "{{ nginx_conf_dir }}/sites-available"
       _vhost_enable_dir: "{{ nginx_conf_dir }}/sites-enabled"
@@ -25,9 +23,6 @@
   when: item.vhost|search(' |/|_')
   with_items: nginx_location
 
-#- name: Create nginx vhost config fragments dir
-#  file: path={{ _vhost_fragments_dir }} state=directory
-
 - name: Create nginx vhost config fragments sub directories
   file: path={{ _vhost_fragments_dir }}/{{ item.vhost }} state=directory
   with_items: nginx_vhost
@@ -46,8 +41,6 @@
   when: not item.ssl|default(false) and item.listen_port != item.ssl_port|default(false)
   with_items: nginx_vhost
 
-- debug: msg="CHECKPOINT"
-
 - name: Create nginx ssl vhost header config fragment 
   template: src=../../templates/vhost/vhost_ssl_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/700-ssl-header.vhost owner=root group=root mode=0644
   when: item.ssl|default(false)
@@ -57,12 +50,6 @@
   template: src=../../templates/vhost/vhost_ssl_footer.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/999-ssl-footer.vhost owner=root group=root mode=0644
   when: item.ssl|default(false)
   with_items: nginx_vhost
-
-### ToDo: How to assemble config for ssl vhost
-
-#- name: Create nginx vhost config 
-#  template: src=../../templates/vhost/vhost.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/999002-vhost owner=root group=root mode=0644
-#  with_items: nginx_vhost
 
 - name: Assemble nginx vhost config
   assemble: src={{ _vhost_fragments_dir }}/{{ item.vhost }} dest={{ _vhost_dir }}/{{ item.vhost }}.conf
@@ -74,8 +61,8 @@
   with_items: nginx_vhost
   notify: Restart nginx
 
-# Might want to consider a task for use_default_location
-### POST vhost.yml
+- include: mailhost.yml
+  when: config_nginx_mailhost
 
 - include: map.yml
   when: config_nginx_map

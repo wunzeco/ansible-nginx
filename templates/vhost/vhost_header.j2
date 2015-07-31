@@ -1,15 +1,13 @@
 {# *** [START] set _listen_options *** #}
+{% set _listen_options = '' %}
 {% if item.listen_options|default(false) %}
 {% set _listen_options = ' ' + item.listen_options %}
-{% else %}
-{% set _listen_options = '' %}
 {% endif -%}
 
+{% set _ipv6_listen_options = 'default ipv6only=on' %}
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
-{% else %}
-{% set _ipv6_listen_options = '' %}
-{% endif %}
+{% endif -%}
 {# *** [END] set _listen_options *** -#}
 
 {% if item.rewrite_www_to_non_www|default(false) %}

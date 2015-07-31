@@ -4,7 +4,7 @@
 {% set _listen_options = ' ' + item.listen_options %}
 {% endif -%}
 
-{% set _ipv6_listen_options = '' %}
+{% set _ipv6_listen_options = 'default ipv6only=on' %}
 {% if item.ipv6_listen_options|default(false) %}
 {% set _ipv6_listen_options = ' ' + item.ipv6_listen_options %}
 {% endif -%}

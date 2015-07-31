@@ -160,23 +160,24 @@ nginx_map:
 
 ### START Mailhost ###
 config_nginx_mailhost:              false
-nginx_mailhost_name:
-nginx_mailhost_listen_port:         80
-nginx_mailhost_listen_ip:           '*'     # accepts a string or a list of IPs
-nginx_mailhost_listen_options:      ''
-nginx_mailhost_ipv6_enable:         false
-nginx_mailhost_ipv6_listen_ip:      '::'    # accepts a string or a list of IPs
-nginx_mailhost_ipv6_listen_port:    80
-nginx_mailhost_ipv6_listen_options: 'default ipv6only=on'
-nginx_mailhost_ssl:                 false
-nginx_mailhost_ssl_cert:            ''      # pre-generated SSL Certificate file
-nginx_mailhost_ssl_key:             ''      # pre-generated SSL Key file
-nginx_mailhost_ssl_port:            443
-nginx_mailhost_starttls:            'off'   # enable STARTTLS support - (on|off|only)
-nginx_mailhost_protocol:            ''      # mail protocol to use - (imap|pop3|smtp)
-nginx_mailhost_auth_http:           ''      # HTTP-like server for authorization
-nginx_mailhost_xclient:             'on'    # whether to use xclient for smtp (on|off)
-nginx_mailhost_server_name:         [ "{{ nginx_mailhost_name }}" ]  # list of mailhostnames for which this mailhost will respond.
+nginx_mailhost:
+  - vhost:
+    listen_port:         80
+    listen_ip:           '*'     # accepts a string or a list of IPs
+    listen_options:      ''
+    ipv6_enable:         false
+    ipv6_listen_ip:      '::'    # accepts a string or a list of IPs
+    ipv6_listen_port:    80
+    ipv6_listen_options: 'default ipv6only=on'
+    ssl:                 false
+    ssl_cert:            ''      # pre-generated SSL Certificate file
+    ssl_key:             ''      # pre-generated SSL Key file
+    ssl_port:            443
+    starttls:            'off'   # enable STARTTLS support - (on|off|only)
+    protocol:            ''      # mail protocol to use - (imap|pop3|smtp)
+    auth_http:           ''      # HTTP-like server for authorization
+    xclient:             'on'    # whether to use xclient for smtp (on|off)
+    server_name:         [  ]    # list of mailhostnames for which this mailhost will respond.
 ### END Mailhost ###
 
 ### START Upstream ###

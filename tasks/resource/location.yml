@@ -1,5 +1,4 @@
 ---
-# Remember to cleanup nginx_conf_fragments_dir as pre-task before configs
 
 - set_fact: 
       _vhost_fragments_dir: "{{ nginx_conf_fragments_dir }}/conf.sites.d"
