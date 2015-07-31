@@ -169,25 +169,28 @@ server {
 {% endif -%}
 
 {# *** [START] set _access_log and _error_log *** #}
-{% set _access_log = item.vhost + '.access.log' %}
-{% set _ssl_access_log 	= 'ssl-' + item.vhost + '.access.log' %}
-{% if item.access_log is defined and item.access_log %}
-{% set _access_log 	= item.access_log %}
-{% set _ssl_access_log 	= 'ssl-' + item.access_log %}
+{% set _access_log = nginx_log_dir + '/' + item.vhost + '.access.log' %}
+{% set _ssl_access_log 	= nginx_log_dir + '/' + 'ssl-' + item.vhost + '.access.log' %}
+{% if item.access_log is defined and item.access_log != 'off' %}
+{% set _access_log 	= nginx_log_dir + '/' + item.access_log %}
+{% set _ssl_access_log 	= nginx_log_dir + '/' + 'ssl-' + item.access_log %}
+{% else item.access_log is defined and item.access_log == 'off' %}
+{% set _access_log  	= 'off' %}
+{% set _ssl_access_log  = 'off' %}
 {% endif -%}
 
-{% set _error_log = item.vhost + '.error.log' %}
-{% set _ssl_error_log 	= 'ssl-' + item.vhost + '.error.log' %}
+{% set _error_log = nginx_log_dir + '/' + item.vhost + '.error.log' %}
+{% set _ssl_error_log 	= nginx_log_dir + '/' + 'ssl-' + item.vhost + '.error.log' %}
 {% if item.error_log is defined and item.error_log %}
-{% set _error_log 	= item.error_log %}
-{% set _ssl_error_log 	= 'ssl-' + item.error_log %}
+{% set _error_log 	= nginx_log_dir + '/' + item.error_log %}
+{% set _ssl_error_log 	= nginx_log_dir + '/' + 'ssl-' + item.error_log %}
 {% endif %}
 {# *** [END] set _access_log and _error_log *** -#}
 
 {% if item.ssl|default(false) %}
-  access_log            {{ _ssl_access_log }};
+  access_log            {{ _ssl_access_log }} {{ item.format_log|default('combined') }};
   error_log             {{ _ssl_error_log }};
 {% else %}
-  access_log            {{ _access_log }};
+  access_log            {{ _access_log }} {{ item.format_log|default('combined') }};
   error_log             {{ _error_log }};
 {% endif %}
