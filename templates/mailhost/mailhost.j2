@@ -14,10 +14,10 @@ server {
 {# Note: the value of item.listen_ip should be a list or a string #}
 {% if item.listen_ip|default('*') is not string and item.listen_ip is iterable %}
 {% for ip in item.listen_ip %}
-  listen {{ ip }}:{{ item.listen_port }}{{ _listen_options }};
+  listen {{ ip }}:{{ item.listen_port|default('80') }}{{ _listen_options }};
 {% endfor %}
 {% else %}
-  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port }}{{ _listen_options }};
+  listen {{ item.listen_ip|default('*') }}:{{ item.listen_port|default('80') }}{{ _listen_options }};
 {% endif -%}
 
 {# check to see if ipv6 support exists in the kernel before applying #}
@@ -25,10 +25,10 @@ server {
 {# Note: the value of item.ipv6_listen_ip should be a list or a string #}
 {% if item.ipv6_listen_ip|default('::') is not string and item.ipv6_listen_ip is iterable %}
 {% for ipv6 in item.ipv6_listen_ip %}
-  listen [{{ ipv6 }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
+  listen [{{ ipv6 }}]:{{ item.ipv6_listen_port|default('80') }}{{ _ipv6_listen_options }};
 {% endfor %}
 {% else %}
-  listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port }}{{ _ipv6_listen_options }};
+  listen [{{ item.ipv6_listen_ip|default('::') }}]:{{ item.ipv6_listen_port|default('80') }}{{ _ipv6_listen_options }};
 {% endif %}
 {% endif %}
 
