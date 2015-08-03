@@ -14,9 +14,9 @@ Some Nginx configs that you can achieve with this role includes:
 More details about available variables can be found in the defaults variables file 
 (defaults/main.yml).
 
-This role is mostly a transpose of James Fryman's well written puppet-nginx module 
-(https://github.com/jfryman/puppet-nginx) into Ansible but simplified where necessary. 
-So lots of credits to him. 
+This role is mostly a recast of James Fryman's very well written puppet-nginx module 
+(https://github.com/jfryman/puppet-nginx) into Ansible but improved and simplified 
+where necessary. So most credits to him. 
 
 ## vHost Config
 

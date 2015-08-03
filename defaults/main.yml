@@ -110,8 +110,8 @@ nginx_service_name:                    nginx
 
 ### START Geo ###
 config_nginx_geo:    false
-nginx_geo:
-  - name:                           # Name of geo mapping entry to create
+nginx_geo:                          # List of geo mapping entries to create
+  - name:                           # Name of a geo mapping entry to create
     networks:        {}             # Hash of geo lookup keys and resultant values
     default:         ''             # Sets the resulting value if the source value fails to match any of the variants.
     ranges:          false          # Indicates that lookup keys (network addresses) are specified as ranges.
@@ -137,8 +137,8 @@ nginx_geo:
 
 ### START Map ###
 config_nginx_map: false
-nginx_map:
-  - name:         client_network      # Name of mapping to create
+nginx_map:                            # List of mapping entries to create
+  - name:         client_network      # Name of a mapping entry to create
     string:       $http_host          # Source string or variable to provide mapping for
     mappings:     {}                  # Hash of map lookup keys and resultant values
     default:      ''                  # Sets the resulting value if the source values fails to match any of the variants.
