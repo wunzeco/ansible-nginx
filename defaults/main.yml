@@ -111,14 +111,14 @@ nginx_service_name:                    nginx
 ### START Geo ###
 config_nginx_geo:    false
 nginx_geo:
-  - name:
-    networks:        {}
-    default:         ''
-    ranges:          false
-    address:         ''
-    delete:          ''
-    proxies:         []
-    proxy_recursive: false
+  - name:                           # Name of geo mapping entry to create
+    networks:        {}             # Hash of geo lookup keys and resultant values
+    default:         ''             # Sets the resulting value if the source value fails to match any of the variants.
+    ranges:          false          # Indicates that lookup keys (network addresses) are specified as ranges.
+    address:         ''             # Nginx defaults to using $remote_addr for testing. This allows you to override that with another variable name (automatically prefixed with $)
+    delete:          ''             # deletes the specified network (see: geo module docs)
+    proxies:         []             # Hash of network->value mappings.
+    proxy_recursive: false          # Changes the behaviour of address acquisition when specifying trusted proxies via 'proxies' directive.
 
 ## Example: nginx_geo
 ## config_nginx_geo:     true
@@ -138,11 +138,11 @@ nginx_geo:
 ### START Map ###
 config_nginx_map: false
 nginx_map:
-  - name:         client_network
-    string:       $http_host
-    mappings:     {}
-    default:      ''
-    hostnames:    false
+  - name:         client_network      # Name of mapping to create
+    string:       $http_host          # Source string or variable to provide mapping for
+    mappings:     {}                  # Hash of map lookup keys and resultant values
+    default:      ''                  # Sets the resulting value if the source values fails to match any of the variants.
+    hostnames:    false               # Indicates that source values can be hostnames with a prefix or suffix mask.
 
 ## Example: nginx_map
 ## config_nginx_map:     true 
@@ -160,32 +160,32 @@ nginx_map:
 ### START Mailhost ###
 config_nginx_mailhost:              false
 nginx_mailhost:
-  - vhost:
+  - vhost:                        # Name of mailhost vhost to create
     listen_port:         80
-    listen_ip:           '*'     # accepts a string or a list of IPs
+    listen_ip:           '*'      # accepts a string or a list of IPs
     listen_options:      ''
     ipv6_enable:         false
-    ipv6_listen_ip:      '::'    # accepts a string or a list of IPs
+    ipv6_listen_ip:      '::'     # accepts a string or a list of IPs
     ipv6_listen_port:    80
     ipv6_listen_options: 'default ipv6only=on'
     ssl:                 false
-    ssl_cert:            ''      # pre-generated SSL Certificate file
-    ssl_key:             ''      # pre-generated SSL Key file
+    ssl_cert:            ''       # pre-generated SSL Certificate file
+    ssl_key:             ''       # pre-generated SSL Key file
     ssl_port:            443
-    starttls:            'off'   # enable STARTTLS support - (on|off|only)
-    protocol:            ''      # mail protocol to use - (imap|pop3|smtp)
-    auth_http:           ''      # HTTP-like server for authorization
-    xclient:             'on'    # whether to use xclient for smtp (on|off)
-    server_name:         [  ]    # list of mailhostnames for which this mailhost will respond.
+    starttls:            'off'    # enable STARTTLS support - (on|off|only)
+    protocol:            ''       # mail protocol to use - (imap|pop3|smtp)
+    auth_http:           ''       # HTTP-like server for authorization
+    xclient:             'on'     # whether to use xclient for smtp (on|off)
+    server_name:         [  ]     # list of mailhostnames for which this mailhost will respond.
 ### END Mailhost ###
 
 ### START Upstream ###
 config_nginx_upstream:  false
 nginx_upstream: 
-  - name: proxypass
-    members: []
-    upstream_cfg_prepend: {}
-    upstream_fail_timeout: '10s'
+  - name: proxypass                    # Name of upstream to create
+    members: []                        # List of member URIs for NGINX to connect to.
+    upstream_cfg_prepend: {}           # Expects a hash with custom directives to put before anything else inside upstream
+    upstream_fail_timeout: '10s'       # Set the fail_timeout for the upstream. Default is 10 seconds - As that is what Nginx does normally.
 
 ## Example: nginx_upstream
 ## config_nginx_upstream:  true
@@ -204,154 +204,150 @@ nginx_upstream:
 
 ### START Location ###
 config_nginx_location:    false
-nginx_location:
-  - location:              /hello/world   
-    vhost:                  myvhost.internal
-    internal:              false
-    www_root:              /var/www 
-    autoindex:           
-    index_files:           [ 'index.html', 'index.htm', 'index.php' ]
-    proxy_pass:            'http://localhost:8080'  
-    proxy_redirect:        "{{ nginx_proxy_redirect }}"
-    proxy_read_timeout:    "{{ nginx_proxy_read_timeout }}"
-    proxy_connect_timeout: "{{ nginx_proxy_connect_timeout }}"
-    proxy_set_header:      "{{ nginx_proxy_set_header }}"
-    fastcgi_script:
-    fastcgi_split_path:
-    fastcgi_pass:          'localhost:9000'
-    fastcgi_param:
+nginx_location:                                                               # A list of location entries. Creates location entries within a vHost
+  - location:              /hello/world                                       # Specifies the URI associated with this location 
+    vhost:                  myvhost.internal                                  # vHost for this location entry to include with
+    internal:              false                                              # Indicates whether or not this location can be used for internal requests only.
+    www_root:              /var/www                                           # Specified the location on disk for files to be read from. Cannot be set in conjuction with proxy_pass
+    autoindex:                                                                # Set to 'on' to activate autoindex directory listing.
+    index_files:           [ 'index.html', 'index.htm', 'index.php' ]         # Index files for NGINX to read when traversing a directory
+    proxy_pass:            'http://localhost:8080'                            # Proxy server for a location to connect to. Can be used with nginx_upstream
+    proxy_redirect:        "{{ nginx_proxy_redirect }}"                       # Sets the text, which must be changed in response-header "Location" and "Refresh" in the response of the proxied server.
+    proxy_read_timeout:    "{{ nginx_proxy_read_timeout }}"                   # Override the default the proxy read timeout value of 90s.
+    proxy_connect_timeout: "{{ nginx_proxy_connect_timeout }}"                # Override the default the proxy connect timeout value of 90s.
+    proxy_set_header:      "{{ nginx_proxy_set_header }}"                     # List of vhost headers to set
+    fastcgi_pass:          'localhost:9000'                                   # Location of fastcgi (host:port)
+    fastcgi_param:                                                            # Set additional custom fastcgi_params
       REQUEST_METHOD:   '$request_method'
-      CONTENT_TYPE:     '$content_type'
+      CONTENT_TYPE:     '$content_type'                             
       CONTENT_LENGTH:   '$content_length'
-    fastcgi_params_file:   "{{ nginx_conf_dir }}/fastcgi_params"
-    fastcgi_script:
-    fastcgi_split_path:
-    uwsgi_pass:            'localhost:9000'
-    uwsgi_params_file:     "{{ nginx_conf_dir }}/uwsgi_params"
-    ssl:
-    ssl_only:
-    location_alias:        html/test/dir
-    location_allow:
-    location_deny:
-    option:
-    stub_status:            false
-    raw_prepend:
-    raw_append:
-    custom_cfg:
-    location_cfg_prepend:
-    location_cfg_append:
-    location_custom_cfg_prepend:
-    location_custom_cfg_append: 
-    include:        
-    try_files:     
-    proxy_cache:           false
-    proxy_cache_key:
-    proxy_cache_use_stale:
-    proxy_cache_valid:     false
-    proxy_method:        
-    proxy_set_body:     
-    auth_basic:        
-    auth_basic_user_file:
-    rewrite_rules:         []
-    priority:              500
-    mp4:                   false
-    flv:                   false
+    fastcgi_params_file:   "{{ nginx_conf_dir }}/fastcgi_params"              # Optional alternative fastcgi_params file to use
+    fastcgi_script:                                                           # optional SCRIPT_FILE parameter
+    fastcgi_split_path:                                                       # Allows settings of fastcgi_split_path_info so that you can split the script_name and path_info via regex
+    uwsgi_pass:            'localhost:9000'                                   # location of uwsgi (host:port)
+    uwsgi_params_file:     "{{ nginx_conf_dir }}/uwsgi_params"                # optional alternative uwsgi_params file to use
+    ssl:                                                                      # Indicates whether to setup SSL bindings for this location
+    ssl_only:                                                                 # Required if the SSL and normal vHost have the same port.
+    location_alias:        html/test/dir                                      # Path to be used as basis for serving requests for this location
+    location_allow:                                                           # Locations to allow connections from
+    location_deny:                                                            # Locations to deny connections from
+    stub_status:            false                                             # If true it will point configure module stub_status to provide nginx stats on location
+    raw_prepend:                                                              # A List of strings to prepend the location directive (after custom_cfg directives). Do not forget semicolon on each line that requires one.
+    raw_append:                                                               # A List of strings to append the location directive (after custom_cfg directives). Do not forget semicolon on each line that requires one.
+    location_custom_cfg:                                                      # Expects a hash with custom directives, cannot be used with other location types (proxy, fastcgi, root, or stub_status)
+    location_cfg_prepend:                                                     # Expects a hash with extra directives to put before anything else inside location (used with all other types except custom_cfg)
+    location_cfg_append:                                                      # Expects a hash with extra directives to put after anything else inside location (used with all other types except custom_cfg)
+    location_custom_cfg_prepend:                                              # Expects a list with extra directives to put before anything else inside location (used with all other types except custom_cfg). Used for logical structures such as 'if'.
+    location_custom_cfg_append:                                               # Expects a list with extra directives to put before anything else inside location (used with all other types except custom_cfg). Used for logical structures such as 'if'.
+    include:                                                                  #
+    try_files:                                                                # A list of file locations to try
+    proxy_cache:           false                                              # Sets name of zone for caching. The same zone can be used in multiple places.
+    proxy_cache_key:                                                          # Override the default proxy_cache_key of $scheme$proxy_host$request_uri
+    proxy_cache_use_stale:                                                    # Override the default proxy_cache_use_stale value of 'off'.
+    proxy_cache_valid:     false                                              # Sets the time for caching different replies.
+    proxy_method:                                                             # If defined, overrides the HTTP method of the request to be passed to the backend.
+    proxy_set_body:                                                           # If defined, sets the body passed to the backend
+    auth_basic:                                                               # HTTP Basic authentication
+    auth_basic_user_file:                                                     # Sets the htpasswd filename for the authentication realm
+    rewrite_rules:         []                                                 # List of rewrite_rules.
+    mp4:                   false                                              # Indicates whether or not this location can be used for mp4 streaming. 
+    flv:                   false                                              # Indicates whether or not this location can be used for flv streaming.
 ### END Location ###
 
 
 ### START vHost ###
 config_nginx_vhost:               true
-nginx_vhost:
-  - vhost:                        myvhost.internal
-    enable:                       true
-    listen_ip:                    '*'
-    listen_port:                  '80'
-    listen_options:               
-    location_allow:               []
-    location_deny:                []
-    ipv6_enable:                  false
-    ipv6_listen_ip:               '::'
-    ipv6_listen_port:             '80'
-    ipv6_listen_options:          'default ipv6only=on'
-    add_header:                   {}
-    ssl:                          false
-    ssl_port:                     443
-    ssl_listen_option:            true
-    ssl_protocols:                'TLSv1 TLSv1.1 TLSv1.2'
-    ssl_key:                      
-    ssl_cert:                     
-    ssl_client_cert:              
-    ssl_dhparam:                  
-    ssl_buffer_size:              
-    ssl_ciphers:                  "{{ nginx_ssl_ciphers }}"
-    ssl_cache:                    'shared:SSL:10m'
-    ssl_crl:                      
-    ssl_stapling:                 false
-    ssl_stapling_file:            
-    ssl_stapling_responder:       
-    ssl_stapling_verify:          false
-    ssl_session_timeout:          '5m'
-    ssl_trusted_cert:             
-    spdy:                         "{{ nginx_spdy }}"
-    proxy_pass:                   
-    proxy_redirect:               
-    proxy_read_timeout:           "{{ nginx_proxy_read_timeout }}"
-    proxy_connect_timeout:        "{{ nginx_proxy_connect_timeout }}"
-    proxy_set_header:             []
-    proxy_cache:                  false
-    proxy_cache_key:              
-    proxy_cache_use_stale:        
-    proxy_cache_valid:            false
-    proxy_method:                 
-    proxy_set_body:               
-    resolver:                     []
-    fastcgi_pass:                 
-    fastcgi_params_file:          "{{ nginx_conf_dir }}/fastcgi_params"
-    fastcgi_script:               
-    uwsgi_pass:                   
-    uwsgi_params_file:            "{{ nginx_conf_dir }}/uwsgi_params"
-    index_files:                  [ 'index.html', 'index.htm', 'index.php'] # use an empty list to disable
-    autoindex:                    
-    server_name:                  [myvhost.internal]
-    www_root:                     
-    rewrite_www_to_non_www:       false
-    rewrite_to_https:             
-    location_custom_cfg:          
-    location_cfg_prepend:         
-    location_cfg_append:          
-    location_custom_cfg_prepend:  
-    location_custom_cfg_append:   
-    try_files:                    
-    auth_basic:                   
-    auth_basic_user_file:         
-    client_body_timeout:          
-    client_header_timeout:        
-    client_max_body_size:         
-    raw_prepend:                  
-    raw_append:                   
-    location_raw_prepend:         
-    location_raw_append:          
-    vhost_cfg_prepend:            
-    vhost_cfg_append:             
-    vhost_cfg_ssl_prepend:        {}
-    vhost_cfg_ssl_append:         {}
-    include_files:                
-    access_log:                   
-    error_log:                    
-    format_log:                   'combined'
-    passenger_cgi_param:          
-    passenger_set_header:         
-    passenger_env_var:            
-    log_by_lua:                   
-    log_by_lua_file:              
-    use_default_location:         true
-    rewrite_rules:                []
-    string_mappings:              {}
-    geo_mappings:                 {}
-    gzip_types:                   
-    owner:                        "{{ nginx_global_owner }}"
-    group:                        "{{ nginx_global_group }}"
-    mode:                         "{{ nginx_global_mode }}"
-    maintenance:                  false
-    maintenance_value:            'return 503'
+nginx_vhost:                                                                  # List of vHosts to create.
+  - vhost:                        myvhost.internal                            # Name of vHost to create 
+    enable:                       true                                        # Whether to enable vHost or not. "true" creates a link in sites-enabled dir
+    listen_ip:                    '*'                                         # Default IP address for NGINX to listen with this vHost on.
+    listen_port:                  '80'                                        # Default IP Port for NGINX to listen with this vHost on. Defaults to TCP 80
+    listen_options:                                                           # Extra options for listen directive like 'default' to catchall. 
+    location_allow:               []                                          # List of locations to allow connections from.
+    location_deny:                []                                          # List of locations to deny connections from.
+    ipv6_enable:                  false                                       # Enable or disable IPv6 support
+    ipv6_listen_ip:               '::'                                        # Default IPv6 address for NGINX to listen with this vHost on.
+    ipv6_listen_port:             '80'                                        # Default IPv6 Port for NGINX to listen with this vHost on.
+    ipv6_listen_options:          'default ipv6only=on'                       # Extra options for listen directive like 'default' to catchall.
+    add_header:                   {}                                          # A hash of headers. Add headers to the HTTP  response when response code is 200, 204, 301, 302 or 304.
+    ssl:                          false                                       # Indicates whether to setup SSL bindings for this vhost.
+    ssl_port:                     443                                         # Default IP Port for NGINX to listen with this SSL vhost on. Defaults to TCP 443
+    ssl_listen_option:            true                                        # 
+    ssl_protocols:                'TLSv1 TLSv1.1 TLSv1.2'                     # SSL protocols enabled. Defaults to 'TLSv1 TLSv1.1 TLSv1.2'
+    ssl_key:                                                                  # Pre-generated SSL Key file to reference for SSL support.  
+    ssl_cert:                                                                 # Pre-generated SSL Certificate file to referece for SSL support.
+    ssl_client_cert:                                                          # Pre-generated SSL Certificate file to reference for client verify SSL support 
+    ssl_dhparam:                                                              # Specifies a file containing Diffie-Hellman key agreement protocol cryptographic paramenters, in PEM format, utilized for exchanging session keys between server and client. 
+    ssl_buffer_size:                                                          # Sets the size of the buffer used for sending data.
+    ssl_ciphers:                  "{{ nginx_ssl_ciphers }}"                   # SSL ciphers enabled. Defaults to value of nginx_ssl_cipher above.
+    ssl_cache:                    'shared:SSL:10m'                            # 
+    ssl_crl:                                                                  # Specifies CRL path in file system 
+    ssl_stapling:                 false                                       # Enables or disables stapling of OCSP responses by the server.
+    ssl_stapling_file:                                                        # When set, the stapled OCSP response will be taken from the specified file instead of querying the OCSP responder specified in the server certificate.
+    ssl_stapling_responder:                                                   # Overrides the URL of the OCSP responder specified in the Authority Information Access certificate extension.
+    ssl_stapling_verify:          false                                       # Enables or disables verification of OCSP responses by the server.
+    ssl_session_timeout:          '5m'                                        #
+    ssl_trusted_cert:                                                         # Specifies a file with trusted CA certificates in the PEM format used to verify client certificates and OCSP responses if ssl_stapling is enabled.
+    spdy:                         "{{ nginx_spdy }}"                          # Toggles SPDY protocol.
+    proxy_pass:                                                               # Proxy server for the root location to connect to. Can be used in conjuction with nginx_upstream
+    proxy_redirect:                                                           # Override the default proxy_redirect value of 'off'.
+    proxy_read_timeout:           "{{ nginx_proxy_read_timeout }}"            # Override the default proxy read timeout value of 90 seconds
+    proxy_connect_timeout:        "{{ nginx_proxy_connect_timeout }}"         # Override the default proxy connect timeout value of 90 seconds
+    proxy_set_header:             []                                          #
+    proxy_cache:                  false                                       #
+    proxy_cache_key:                                                          # Override the default proxy_cache_key of $scheme$proxy_host$request_uri
+    proxy_cache_use_stale:                                                    # Override the default proxy_cache_use_stale value of 'off'.
+    proxy_cache_valid:            false                                       # Sets the time for caching different replies.
+    proxy_method:                                                             # If defined, overrides the HTTP method of the request to be passed to the backend.
+    proxy_set_body:                                                           # If defined, sets the body passed to the backend.
+    resolver:                     []                                          # List of name servers used to resolve names of upstream servers into address.
+    fastcgi_pass:                                                             # Location of fastcgi (host:port) 
+    fastcgi_params_file:          "{{ nginx_conf_dir }}/fastcgi_params"       # optional alternative fastcgi_params file to use
+    fastcgi_script:                                                           # optional SCRIPT_FILE parameter 
+    uwsgi_pass:                                                               # 
+    uwsgi_params_file:            "{{ nginx_conf_dir }}/uwsgi_params"         #
+    index_files:                  [ 'index.html', 'index.htm', 'index.php']   # Default index files for NGINX to read when traversing a directory. Use an empty list to disable
+    autoindex:                                                                # Set it on 'on' or 'off 'to activate/deactivate
+    server_name:                  [myvhost.internal]                          # 
+    www_root:                                                                 #  
+    rewrite_www_to_non_www:       false                                       # Adds a server directive and rewrite rule to rewrite www.domain.com to domain.com in order to avoid duplicate content (SEO) 
+    rewrite_to_https:                                                         # Adds a server directiv and rewrite rule to rewrite to ssl 
+    location_custom_cfg:                                                      # 
+    location_cfg_prepend:                                                     #
+    location_cfg_append:                                                      #
+    location_custom_cfg_prepend:                                              #
+    location_custom_cfg_append:                                               #
+    try_files:                                                                # Specifies the locations for files to be checked as an array. Cannot be used in conjuction with proxy_pass.
+    auth_basic:                                                               # HTTP basic Authentication
+    auth_basic_user_file:                                                     # Sets the httpasswd filename for the authentication realm.
+    client_body_timeout:                                                      # Sets how long the server will wait for a client body. Default is 60s
+    client_header_timeout:                                                    # Sets how long the server will wait for a client header. Default is 60s
+    client_max_body_size:                                                     # Sets client_max_body_size
+    raw_prepend:                                                              # A list of strings to prepend to the server directive (after cfg prepend directives). Do not forget semicolon on each line that requires one.
+    raw_append:                                                               # A list of strings to append to the server directive (after cfg append directives). Do not forget semicolon on each line that requires one.
+    location_raw_prepend:                                                     # A list of strings to prepend to the location directive (after custom_cfg directives). Do not forget semicolon on each line that requires one.
+    location_raw_append:                                                      # A list of strings to append to the location directive (after custom_cfg directives). Do not forget semicolon on each line that requires one.
+    vhost_cfg_prepend:                                                        # Expects a hash with custom directives to put before everything else inside vhost
+    vhost_cfg_append:                                                         # Expects a hash with custom directives to put after everything else inside vhost
+    vhost_cfg_ssl_prepend:        {}                                          # Expects a hash with custom directives to put before everything else inside vhost ssl
+    vhost_cfg_ssl_append:         {}                                          # Expects a hash with custom directives to put after everything else inside vhost ssl
+    include_files:                                                            # Adds include files to vhost
+    access_log:                                                               # Where to write access log. May add additional options like log format at the end
+    error_log:                                                                # Where to write error log.
+    format_log:                   'combined'                                  # log format name
+    passenger_cgi_param:                                                      #  Allows one to define additional CGI environment variables to pass to the backend application
+    passenger_set_header:                                                     # Allows one to set headers to pass to the backend application (Passenger 5.0+)
+    passenger_env_var:                                                        # Allows one to set environment variables to pass to the backend application (Passenger 5.0+)
+    log_by_lua:                                                               # Run the Lua source code inlined as the <lua-script-str> at the log request processing phase.
+    log_by_lua_file:                                                          # Equivalent to log_by_lua, except that the file specified by <path-to-lua-script-file> contains the Lua code, or, as from the v0.5.0rc32 release, the Lua/LuaJIT bytecode to be executed.
+    use_default_location:         true                                        # A list of rewrite rules strings.
+    rewrite_rules:                []                                          # 
+    string_mappings:              {}                                          #
+    geo_mappings:                 {}                                          #
+    gzip_types:                                                               # Defines gzip_types, nginx default is text/html
+    owner:                        "{{ nginx_global_owner }}"                  #
+    group:                        "{{ nginx_global_group }}"                  #
+    mode:                         "{{ nginx_global_mode }}"                   #
+    maintenance:                  false                                       # Boolean value to set a vhost in maintenance
+    maintenance_value:            'return 503'                                # Value to return when maintenance is on. Defaults to return 503.
 ### END vHost ###

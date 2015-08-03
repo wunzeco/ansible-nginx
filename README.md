@@ -11,9 +11,12 @@ Some Nginx configs that you can achieve with this role includes:
 - geo
 - mappings
 
-More details about available variables can be found in the defaults variables file
+More details about available variables can be found in the defaults variables file 
 (defaults/main.yml).
 
+This role is mostly a transpose of James Fryman's well written puppet-nginx module 
+(https://github.com/jfryman/puppet-nginx) into Ansible but simplified where necessary. 
+So lots of credits to him. 
 
 ## vHost Config
 
