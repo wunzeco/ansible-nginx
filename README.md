@@ -1,9 +1,27 @@
 NGINX
 =====
 
-This role manages NGINX. 
+This role installs and configures NGINX. 
 
-Some Nginx configs that you can achieve with this role includes:
+
+Requirements
+------------
+
+Ansible v1.8 or higher. Platform requirements are listed in the metadata file
+
+
+Role Variables
+--------------
+
+The focus of this documentation is on examples/usage so as to keep this readme 
+concise. Hence, further documentation about available variables can be found in 
+the default variables file (defaults/main.yml). Most variables are self explanatory.
+
+
+Examples
+========
+
+Some Nginx configs that you can create with this role include:
 - vhost
 - location
 - upstream
@@ -11,12 +29,8 @@ Some Nginx configs that you can achieve with this role includes:
 - geo
 - mappings
 
-More details about available variables can be found in the defaults variables file 
-(defaults/main.yml).
+Some examples are given below.
 
-This role is mostly a recast of James Fryman's very well written puppet-nginx module 
-(https://github.com/jfryman/puppet-nginx) into Ansible but improved and simplified 
-where necessary. So most credits to him. 
 
 ## vHost Config
 
@@ -92,6 +106,7 @@ nginx_vhost:
 **Note**: Each dict item in the nginx_vhost list must have a vhost key as this is 
 the key that binds vhost and location configs.
 
+
 ## Location config
 
 nginx\_location: A list of location dict items to be configured within vhosts.
@@ -151,6 +166,7 @@ nginx_location:
     ssl_only:              true
 ```
 
+
 ## Upstream
 
 nginx\_upstream: A list of upstream dict items.
@@ -171,6 +187,7 @@ nginx_upstream:
       - '172.20.1.199:8443 max_fails=3 fail_timeout=5'
       - '172.20.1.198:8443 max_fails=3 fail_timeout=5'
 ```
+
 
 ## Mailhost
 
@@ -197,3 +214,30 @@ It is good practice to validate Nginx configuration after a config change happen
 ```
 nginx_configtest_enable: true
 ```
+
+
+Dependencies
+------------
+
+None
+
+
+License
+-------
+
+BSD
+
+
+Author Information
+------------------
+
+Ogonna Iwunze
+
+
+Credits
+-------
+
+This role is mostly a recast of James Fryman's very well written puppet-nginx module 
+(https://github.com/jfryman/puppet-nginx) into Ansible but improved and simplified 
+where necessary. So most credits to him. 
+
