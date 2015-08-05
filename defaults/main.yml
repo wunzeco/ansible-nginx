@@ -277,6 +277,7 @@ nginx_vhost:                                                                  # 
     ssl_key:                                                                  # Pre-generated SSL Key file to reference for SSL support.  
     ssl_cert:                                                                 # Pre-generated SSL Certificate file to referece for SSL support.
     ssl_client_cert:                                                          # Pre-generated SSL Certificate file to reference for client verify SSL support 
+    ssl_verify_client:                                                        # Enables verification of client certificates. (on | off | optional | optional_no_ca)
     ssl_dhparam:                                                              # Specifies a file containing Diffie-Hellman key agreement protocol cryptographic paramenters, in PEM format, utilized for exchanging session keys between server and client. 
     ssl_buffer_size:                                                          # Sets the size of the buffer used for sending data.
     ssl_ciphers:                  "{{ nginx_ssl_ciphers }}"                   # SSL ciphers enabled. Defaults to value of nginx_ssl_cipher above.
@@ -340,7 +341,7 @@ nginx_vhost:                                                                  # 
     passenger_env_var:                                                        # Allows one to set environment variables to pass to the backend application (Passenger 5.0+)
     log_by_lua:                                                               # Run the Lua source code inlined as the <lua-script-str> at the log request processing phase.
     log_by_lua_file:                                                          # Equivalent to log_by_lua, except that the file specified by <path-to-lua-script-file> contains the Lua code, or, as from the v0.5.0rc32 release, the Lua/LuaJIT bytecode to be executed.
-    use_default_location:         true                                        # A list of rewrite rules strings.
+    use_default_location:         true                                        # Create a default (.i.e "/") location block. NOTE: Set to "false" if you need to explicitly define an nginx_location hash for "/" location.
     rewrite_rules:                []                                          # 
     string_mappings:              {}                                          #
     geo_mappings:                 {}                                          #
