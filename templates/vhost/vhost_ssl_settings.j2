@@ -4,7 +4,7 @@
   ssl_certificate_key       {{ item.ssl_key }};
 {% if item.ssl_client_cert|default(false) %}
   ssl_client_certificate    {{ item.ssl_client_cert }};
-  ssl_verify_client on;
+  ssl_verify_client 	    {{ item.ssl_verify_client|default('on') }};
 {% endif %}
 {% if item.ssl_dhparam|default(false) %}
   ssl_dhparam               {{ item.ssl_dhparam }};
