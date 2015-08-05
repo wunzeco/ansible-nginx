@@ -239,5 +239,5 @@ Credits
 
 This role is mostly a recast of James Fryman's very well written puppet-nginx module 
 (https://github.com/jfryman/puppet-nginx) into Ansible but improved and simplified 
-where necessary. So most credits to him. 
+where necessary. So credits to him. 
 
