@@ -34,7 +34,7 @@ Some examples are given below.
 
 ## vHost Config
 
-nginx\_vhost:  a list of vhost dict items. Each item results in a vhost config file.
+**nginx\_vhost**:  a list of vhost dict items. Each item results in a vhost config file.
 
 ```
 nginx_vhost:
@@ -109,7 +109,7 @@ the key that binds vhost and location configs.
 
 ## Location config
 
-nginx\_location: A list of location dict items to be configured within vhosts.
+**nginx\_location**: A list of location dict items to be configured within vhosts.
 
 **Note**: Each dict item in the nginx_location list must have a vhost key as this is 
 the key that binds vhost and location configs.
@@ -169,7 +169,7 @@ nginx_location:
 
 ## Upstream
 
-nginx\_upstream: A list of upstream dict items.
+**nginx\_upstream**: A list of upstream dict items.
 
 ```
 config_nginx_upstream:  true
@@ -191,7 +191,7 @@ nginx_upstream:
 
 ## Mailhost
 
-nginx\_mailhost: A list of mailhost vhost dict items.
+**nginx\_mailhost**: A list of mailhost vhost dict items.
 
 ```
 config_nginx_mailhost:   true
