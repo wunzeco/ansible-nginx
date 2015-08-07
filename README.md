@@ -7,7 +7,10 @@ This role installs and configures NGINX.
 Requirements
 ------------
 
-Ansible v1.8 or higher. Platform requirements are listed in the metadata file
+- Ansible v1.9.2 or higher.
+- Jinja2 v2.7 or higher. (available as pip package)
+
+Platform requirements are listed in the metadata file
 
 
 Role Variables
