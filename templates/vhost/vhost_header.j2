@@ -174,7 +174,7 @@ server {
 {% if item.access_log is defined and item.access_log != 'off' %}
 {% set _access_log 	= nginx_log_dir + '/' + item.access_log %}
 {% set _ssl_access_log 	= nginx_log_dir + '/' + 'ssl-' + item.access_log %}
-{% else item.access_log is defined and item.access_log == 'off' %}
+{% elif item.access_log is defined and item.access_log == 'off' %}
 {% set _access_log  	= 'off' %}
 {% set _ssl_access_log  = 'off' %}
 {% endif -%}
