@@ -39,7 +39,7 @@
 
 - name: Create nginx location config for non-ssl vhost
   template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/410-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
-  when: not item.ssl|default(false) and item.listen_port != item.ssl_port|default(false)
+  when: not item.ssl|default(false) 
   with_items: nginx_location
 
 - name: Create nginx location config for ssl vhost

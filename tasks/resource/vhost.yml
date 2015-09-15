@@ -38,12 +38,12 @@
 
 - name: Create nginx non-ssl vhost header config fragment 
   template: src=../../templates/vhost/vhost_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/001-nonssl-header.vhost owner=root group=root mode=0644
-  when: not item.ssl|default(false) and item.listen_port != item.ssl_port|default(false)
+  when: not item.ssl|default(false)
   with_items: nginx_vhost
 
 - name: Create nginx non-ssl vhost footer config fragment 
   template: src=../../templates/vhost/vhost_footer.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/699-nonssl-footer.vhost owner=root group=root mode=0644
-  when: not item.ssl|default(false) and item.listen_port != item.ssl_port|default(false)
+  when: not item.ssl|default(false)
   with_items: nginx_vhost
 
 - name: Create nginx ssl vhost header config fragment 
