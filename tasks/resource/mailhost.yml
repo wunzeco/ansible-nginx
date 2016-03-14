@@ -2,11 +2,11 @@
 - name: Validate ssl_cert and ssl_key
   fail: msg="[nginx] SSL certificat/key must be defined"
   when: item.starttls|match('on|only') and (item.ssl_cert == '' or item.ssl_key == '')
-  with_items: nginx_mailhost
+  with_items: "{{ nginx_mailhost }}"
 
 
 - name: Create nginx non-ssl mailhost config
   template: src=../../templates/mailhost/mailhost.j2 dest={{ nginx_conf_dir }}/conf.mail.d/{{ item.vhost }}.conf owner=root group=root mode=0644
   notify: Restart nginx
-  with_items: nginx_mailhost
+  with_items: "{{ nginx_mailhost }}"
 
