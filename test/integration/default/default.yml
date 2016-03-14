@@ -1,0 +1,10 @@
+---
+- hosts: test-kitchen
+
+  vars:
+    registrator_service_registry_backend: consul
+    registrator_service_registry_host: "{{ ansible_default_ipv4.address }}"
+    registrator_service_registry_port: 8500
+    
+  roles:
+    - ansible-nginx

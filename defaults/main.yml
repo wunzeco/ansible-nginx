@@ -1,4 +1,7 @@
 ---
+nginx_repo: 
+nginx_mainline_repo: 
+
 ### START Module/App Configuration ###
 nginx_conf_dir:               /etc/nginx
 nginx_log_dir:                /var/log/nginx
