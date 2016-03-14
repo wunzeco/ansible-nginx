@@ -40,6 +40,7 @@ describe file("#{nginx_conf_dir}/nginx.conf") do
   it { should be_owned_by 'root' }
 end
 
+
 #-----------------
 #  Service
 describe service('nginx') do

@@ -1,0 +1,263 @@
+---
+############################################
+##  START - Module/App Configuration 
+nginx_daemon_user:            www-data
+nginx_confd_purge:            true
+nginx_vhost_purge:            true
+##  END - Module/App Configuration 
+############################################
+
+############################################
+##  START - Nginx Configuration 
+nginx_gzip:                            'on'
+nginx_gzip_buffers:                    '16 8k'
+nginx_gzip_comp_level:                 6
+nginx_gzip_disable:                    'msie6'
+nginx_gzip_min_length:                 1100
+nginx_gzip_http_version:               1.1
+nginx_gzip_proxied:                    'any'
+nginx_gzip_types:                      'application/x-javascript text/javascript text/js text/css'
+nginx_gzip_vary:                       'on'
+
+nginx_names_hash_bucket_size:          128
+nginx_proxy_cache_inactive:            '10m'
+nginx_proxy_cache_keys_zone:           'og_cache:2M'
+nginx_proxy_cache_levels:              2
+nginx_proxy_cache_max_size:            '50m'
+nginx_proxy_cache_path:                '/var/cache/nginx/proxy_cache'
+nginx_proxy_connect_timeout:           6
+nginx_proxy_http_version:              1.1
+nginx_proxy_read_timeout:              60
+nginx_proxy_send_timeout:              60
+
+nginx_server_tokens:                   'off'
+nginx_worker_connections:              8192
+nginx_worker_processes:                2
+##  END - Nginx Configuration 
+############################################
+
+
+############################################
+##  START - Nginx Service Configuation 
+nginx_configtest_enable:                true
+##  END - Nginx Service Configuration 
+############################################
+
+
+############################################
+##  START - Nginx Upstream Configuration
+config_nginx_upstream:  true
+nginx_upstream:
+  - name: play-WAF-lbs
+    members:
+      - '10.20.1.199:443 max_fails=3 fail_timeout=5'
+      - '10.20.1.198:443 max_fails=3 fail_timeout=5'
+  - name: play-WAF-admin-lbs
+    members:
+      - '10.20.1.199:443 max_fails=3 fail_timeout=5'
+      - '10.20.1.198:443 max_fails=3 fail_timeout=5'
+  - name: play-WAF-operations-lbs
+    members:
+      - '10.20.1.199:443 max_fails=3 fail_timeout=5'
+      - '10.20.1.198:443 max_fails=3 fail_timeout=5'
+  - name: play-WAF-checkout-lbs
+    members:
+      - '10.20.1.199:8443 max_fails=3 fail_timeout=5'
+      - '10.20.1.198:8443 max_fails=3 fail_timeout=5'
+##  END - Nginx Upstream Configuration
+############################################
+
+
+############################################
+##  START - Nginx Location Configuration
+# Remember proxy_set_header config - taken from hiera
+config_nginx_location:  true
+# **ACTION**:
+#     - Hehehe, index_files should not exist for /worldPayPayment/notification so check this
+nginx_location:
+  - location:              '/503.html'
+    vhost:                 'play-admin.example.co.uk'
+    www_root:              '/etc/nginx/errors/'
+    ssl:                   true
+    ssl_only:              true
+    index_files:           [ index.html, index.htm, index.php]
+  - location:              '/503.html'
+    vhost:                 'play-operations.example.co.uk'
+    www_root:              '/etc/nginx/errors/'
+    ssl:                   true
+    ssl_only:              true
+  - location:              '/checkout/notify'
+    vhost:                 'play-services.example.co.uk'
+    proxy_pass:            'https://play-WAF-checkout-lbs/checkout/notify'
+    proxy_read_timeout:    60
+    location_custom_cfg_prepend:
+      if: "($ssl_client_verify != SUCCESS) {\n      return 403;\n      break;\n    }\n"
+    ssl:                   true
+    ssl_only:              true
+  - location:              '/checkout/reports'
+    vhost:                 'play-services.example.co.uk'
+    proxy_pass:            'https://play-WAF-checkout-lbs/checkout/reports'
+    proxy_read_timeout:    60
+    location_custom_cfg_prepend:
+      if: "($ssl_client_verify != SUCCESS) {\n      return 403;\n      break;\n    }\n"
+    ssl:                   true
+    ssl_only:              true
+  - location:              '= favicon.ico'
+    vhost:                 'play.example.co.uk'
+    www_root:              '/etc/nginx/errors/'
+    ssl:                   true
+    ssl_only:              true
+  - location:              '/503.html'
+    vhost:                 'play.example.co.uk'
+    www_root:              '/etc/nginx/errors/'
+    ssl:                   true
+    ssl_only:              true
+  - location:              '/payment/notification'
+    vhost:                 'play.example.co.uk'
+    proxy_pass:            'https://play-WAF-lbs'
+    proxy_read_timeout:    60
+    proxy_redirect:        'off'
+    location_allow:
+      - 172.20.1.111
+      - 194.168.223.139
+      - 37.26.93.122
+    location_deny:         [ all ]
+    proxy_set_header: 
+      - 'Host $host'      
+      - 'X-Real-IP $remote_addr'
+      - 'X-Forwarded-For $proxy_add_x_forwarded_for'
+    ssl:                   true
+    ssl_only:              true
+  - location:              '/'
+    vhost:                 'play.example.co.uk'
+    ssl:                   true
+    ssl_only:              true
+    proxy_pass:            'https://play-WAF-lbs'
+    proxy_read_timeout:    60
+    proxy_redirect:        'off'
+    proxy_cache:           og_cache
+    proxy_cache_valid:     5m
+    proxy_set_header:       
+      - "X-OG-Traffic-Control $traffic_control"    
+      - "X-Real-IP $remote_addr"    
+      - "X-Forwarded-For $proxy_add_x_forwarded_for"    
+      - "Host $host"
+    raw_prepend:          
+      - "set $maintenance_mode 1;"        
+      - "if (-f /etc/nginx/MAINTENANCE-MODE) {\n             set $maintenance_mode 1;\n        }"        
+      - "if ($remote_addr ~* 86.190.186.134) {\n             set $maintenance_mode 0;\n        }"        
+      - "if ($remote_addr ~* 52.30.132.201) {\n             set $maintenance_mode 0;\n        }"        
+      - "if ($remote_addr ~* 52.50.38.216) {\n             set $maintenance_mode 0;\n        }"        
+      - "if ($host ~* special-access.ext.example.co.uk) {\n             set $maintenance_mode 0;\n        }"        
+      - "if ($maintenance_mode = 1) {\n             return 503;\n        }"    
+      - "set $tc normal;"
+      - "set $traffic_control normal;"        
+      - "if (-f /etc/nginx/CANARY-MODE) {\n             set $tc C;\n        }"        
+      - "if ($remote_addr ~* 52.30.132.201) {\n             set $tc \"${tc}I\";\n        }"        
+      - "if ($remote_addr ~* 52.50.38.216) {\n             set $tc \"${tc}I\";\n        }"        
+      - "if ($tc = C) {\n             set $traffic_control Canary_mode_active;\n        }"        
+      - "if ($tc = CI) {\n             set $traffic_control Canary;\n        }"    
+##  END - Nginx Location Configuration
+############################################
+
+
+############################################
+##  START - Nginx vHost Configuration
+# **ACTION**: 
+#     - You need to revisit location_cfg_prepend for play.example.co.uk
+nginx_vhost:
+  - vhost:                         play.example.co.uk
+    use_default_location:          false
+    listen_port:                   443
+    listen_options:                default_server
+    ssl:                           true
+    ssl_port:                      443
+    ssl_key:                       /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:                      /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    ssl_protocols:                 'TLSv1 TLSv1.1 TLSv1.2'
+    proxy_pass:                    'https://play-WAF-lbs'
+    proxy_read_timeout:            60
+    proxy_cache:                   og_cache
+    proxy_cache_valid:             5m
+    vhost_cfg_ssl_prepend:         
+      error_page:       '502 503 504 /503.html'
+      real_ip_header:   'X-Forwarded-For'
+      set_real_ip_from: '0.0.0.0/0'
+  - vhost:                         play-admin.example.co.uk
+    use_default_location:          true
+    listen_port:                   443
+    ssl:                           true
+    ssl_port:                      443
+    ssl_protocols:                 'TLSv1 TLSv1.1 TLSv1.2'
+    ssl_key:                       /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:                      /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    proxy_pass:                    'https://play-WAF-admin-lbs'
+    proxy_read_timeout:            60
+    proxy_redirect:                'off'
+    vhost_cfg_ssl_prepend:         
+      error_page:       '502 503 504 /503.html'
+      real_ip_header:   'X-Forwarded-For'
+      set_real_ip_from: '0.0.0.0/0'
+  - vhost:                         play-operations.example.co.uk
+    use_default_location:          true
+    listen_port:                   443
+    ssl:                           true
+    ssl_port:                      443
+    ssl_protocols:                 'TLSv1 TLSv1.1 TLSv1.2'
+    ssl_key:                       /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:                      /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    proxy_pass:                    'https://play-WAF-operations-lbs'
+    proxy_read_timeout:            60
+    proxy_redirect:                'off'
+    vhost_cfg_ssl_prepend:         
+      error_page:       '502 503 504 /503.html'
+      real_ip_header:   'X-Forwarded-For'
+      set_real_ip_from: '0.0.0.0/0'
+  - vhost:                         play-payments.example.co.uk
+    use_default_location:          true
+    enable:                        false
+    listen_port:                   443
+    ssl:                           true
+    ssl_port:                      443
+    ssl_protocols:                 'TLSv1 TLSv1.1 TLSv1.2'
+    ssl_key:                       /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:                      /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    proxy_pass:                    'https://play-WAF-lbs'
+    proxy_read_timeout:            60
+    proxy_redirect:                'off'
+    vhost_cfg_ssl_prepend:         
+      error_page:       '502 503 504 /503.html'
+      real_ip_header:   'X-Forwarded-For'
+      set_real_ip_from: '0.0.0.0/0'
+  - vhost:                         play-services.example.co.uk
+    use_default_location:          true
+    listen_port:                   8443
+    ssl:                           true
+    ssl_port:                      8443
+    ssl_protocols:                 'TLSv1 TLSv1.1 TLSv1.2'
+    ssl_key:                       /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:                      /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    ssl_client_cert:               /etc/ssl/certs/ssl-cert-checkout-client-root-ca.pem
+    ssl_verify_client:             'optional'
+    proxy_pass:                    'https://play-WAF-checkout-lbs'
+    proxy_read_timeout:            60
+    proxy_redirect:                'off'
+    location_deny:                 [ all ]
+    vhost_cfg_ssl_prepend:         
+      error_page:       '502 503 504 /503.html'
+      real_ip_header:   'X-Forwarded-For'
+      set_real_ip_from: '0.0.0.0/0'
+##  END - Nginx vHost Configuration
+############################################
+
+config_nginx_mailhost:   true
+nginx_mailhost:
+  - vhost:               play.example.co.uk
+    listen_port:         80
+    listen_ip:           '*'
+    ssl:                 true
+    ssl_key:             /etc/ssl/private/ssl-cert-wildcard-example-co-uk.key
+    ssl_cert:            /etc/ssl/certs/ssl-cert-wildcard-example-co-uk.pem
+    ssl_port:            443
+    starttls:            'off'
+    protocol:            'smtp'
