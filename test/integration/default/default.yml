@@ -2,7 +2,7 @@
 - hosts: test-kitchen
 
   vars_files:
-    - vars.yml
+    - roles/ansible-nginx/test/integration/default/vars.yml
 
   roles:
     - ansible-nginx

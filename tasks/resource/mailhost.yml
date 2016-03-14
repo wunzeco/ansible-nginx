@@ -6,7 +6,12 @@
 
 
 - name: Create nginx non-ssl mailhost config
-  template: src=../../templates/mailhost/mailhost.j2 dest={{ nginx_conf_dir }}/conf.mail.d/{{ item.vhost }}.conf owner=root group=root mode=0644
+  template:
+    src:    mailhost/mailhost.j2
+    dest:   "{{ nginx_conf_dir }}/conf.mail.d/{{ item.vhost }}.conf" 
+    owner:  root
+    group:  root
+    mode:   0644
   notify: Restart nginx
   with_items: "{{ nginx_mailhost }}"
 

@@ -5,6 +5,11 @@
   with_items: "{{ nginx_map }}"
 
 - name: Create nginx map config
-  template: src=../../templates/conf.d/map.j2 dest={{ nginx_conf_dir }}/conf.d/{{ item.name }}-map.conf owner=root group=root mode=0644
+  template: 
+    src:    conf.d/map.j2 
+    dest:   "{{ nginx_conf_dir }}/conf.d/{{ item.name }}-map.conf" 
+    owner:  root
+    group:  root
+    mode:   0644
   with_items: "{{ nginx_map }}"
   notify: Restart nginx

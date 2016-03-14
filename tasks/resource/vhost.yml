@@ -37,31 +37,58 @@
   when: config_nginx_location
 
 - name: Create nginx non-ssl vhost header config fragment 
-  template: src=../../templates/vhost/vhost_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/001-nonssl-header.vhost owner=root group=root mode=0644
+  template: 
+    src:    vhost/vhost_header.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/001-nonssl-header.vhost"
+    owner:  root
+    group:  root
+    mode:   0644
   when: not item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
 - name: Create nginx non-ssl vhost footer config fragment 
-  template: src=../../templates/vhost/vhost_footer.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/699-nonssl-footer.vhost owner=root group=root mode=0644
+  template: 
+    src:    vhost/vhost_footer.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/699-nonssl-footer.vhost"
+    owner:  root
+    group:  root
+    mode:   0644
   when: not item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
 - name: Create nginx ssl vhost header config fragment 
-  template: src=../../templates/vhost/vhost_ssl_header.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/700-ssl-header.vhost owner=root group=root mode=0644
+  template:
+    src:    vhost/vhost_ssl_header.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/700-ssl-header.vhost"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
 - name: Create nginx ssl vhost footer config fragment 
-  template: src=../../templates/vhost/vhost_ssl_footer.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/999-ssl-footer.vhost owner=root group=root mode=0644
+  template:
+    src:    vhost/vhost_ssl_footer.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/999-ssl-footer.vhost"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
 - name: Assemble nginx vhost config
-  assemble: src={{ _vhost_fragments_dir }}/{{ item.vhost }} dest={{ _vhost_dir }}/{{ item.vhost }}.conf
+  assemble:
+    src:    "{{ _vhost_fragments_dir }}/{{ item.vhost }}"
+    dest:   "{{ _vhost_dir }}/{{ item.vhost }}.conf"
   with_items: "{{ nginx_vhost }}"
 
 - name: Enable nginx vhost config
-  file: src={{ _vhost_dir }}/{{ item.vhost }}.conf dest={{ _vhost_enable_dir }}/{{ item.vhost }}.conf owner=root group=root state=link
+  file:
+    src:    "{{ _vhost_dir }}/{{ item.vhost }}.conf"
+    dest:   "{{ _vhost_enable_dir }}/{{ item.vhost }}.conf"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.enable|default(true)
   with_items: "{{ nginx_vhost }}"
   notify: Restart nginx

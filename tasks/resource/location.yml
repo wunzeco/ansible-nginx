@@ -28,32 +28,62 @@
 
 # Consider moving fastcgi and uwsgi_params files tasks to config.yml
 - name: Create nginx fastcgi params conf file
-  template: src=../../templates/vhost/fastcgi_params.j2 dest={{ nginx_fastcgi_params_file }} owner=root group=root mode=0644
+  template: 
+    src:    vhost/fastcgi_params.j2 
+    dest:   "{{ nginx_fastcgi_params_file }}"
+    owner:  root 
+    group:  root
+    mode:   0644
   when: item.fastcgi_pass|default(false)
   with_items: "{{ nginx_location }}"
 
 - name: Create nginx uwsgi params conf file
-  template: src=../../templates/vhost/uwsgi_params.j2 dest={{ nginx_uwsgi_params_file }} owner=root group=root mode=0644
+  template: 
+    src:    vhost/uwsgi_params.j2
+    dest:   "{{ nginx_uwsgi_params_file }}"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.uwsgi_pass|default(false)
   with_items: "{{ nginx_location }}"
 
 - name: Create nginx location config for non-ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/410-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
+  template:
+    src:    vhost/location.j2 
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/410-nonssl-{{ item.location|regex_replace(' |/', '_') }}.location" 
+    owner:  root 
+    group:  root 
+    mode:   0644
   when: not item.ssl|default(false) 
   with_items: "{{ nginx_location }}"
 
 - name: Create nginx location config for ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/810-ssl-{{ item.location|regex_replace(' |/', '_') }}.location owner=root group=root mode=0644
+  template: 
+    src:    vhost/location.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/810-ssl-{{ item.location|regex_replace(' |/', '_') }}.location"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.ssl|default(false)
   with_items: "{{ nginx_location }}"
 
 ## Configure default location '/' for each vhost with use_default_location attribute enabled
 - name: Create nginx default location config for non-ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-default.location owner=root group=root mode=0644
+  template: 
+    src:    vhost/location.j2
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/400-nonssl-default.location"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.use_default_location and not item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
 - name: Create nginx default location config for ssl vhost
-  template: src=../../templates/vhost/location.j2 dest={{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-default.location owner=root group=root mode=0644
+  template: 
+    src:    vhost/location.j2 
+    dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/800-ssl-default.location"
+    owner:  root
+    group:  root
+    mode:   0644
   when: item.use_default_location and item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"

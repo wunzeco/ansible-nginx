@@ -1,6 +1,11 @@
 ---
 
 - name: Create nginx geo config
-  template: src=../../templates/conf.d/geo.j2 dest={{ nginx_conf_dir }}/conf.d/{{ item.name }}-geo.conf owner=root group=root mode=0644 
+  template: 
+    src:    conf.d/geo.j2 
+    dest:   "{{ nginx_conf_dir }}/conf.d/{{ item.name }}-geo.conf" 
+    owner:  root 
+    group:  root 
+    mode:   0644 
   with_items: "{{ nginx_geo }}"
   notify: Restart nginx
