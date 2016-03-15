@@ -80,6 +80,9 @@
   assemble:
     src:    "{{ _vhost_fragments_dir }}/{{ item.vhost }}"
     dest:   "{{ _vhost_dir }}/{{ item.vhost }}.conf"
+    owner:  root
+    group:  root
+    mode:   0644
   with_items: "{{ nginx_vhost }}"
 
 - name: Enable nginx vhost config
@@ -89,6 +92,7 @@
     owner:  root
     group:  root
     mode:   0644
+    state:  link
   when: item.enable|default(true)
   with_items: "{{ nginx_vhost }}"
   notify: Restart nginx

@@ -3,6 +3,7 @@ require 'spec_helper'
 nginx_conf_dir = '/etc/nginx'
 nginx_run_dir = '/var/nginx'
 nginx_log_dir = '/var/log/nginx'
+nginx_vhost_domain = 'example.co.uk'
 
 
 #-----------------
@@ -40,6 +41,27 @@ describe file("#{nginx_conf_dir}/nginx.conf") do
   it { should be_owned_by 'root' }
 end
 
+describe file("#{nginx_conf_dir}/sites-available/play.#{nginx_vhost_domain}.conf") do
+  it { should be_file }
+  it { should be_mode 644 }
+  it { should be_owned_by 'root' }
+end
+
+describe file("#{nginx_conf_dir}/sites-enabled/play.#{nginx_vhost_domain}.conf") do
+  it { should be_linked_to "#{nginx_conf_dir}/sites-available/play.#{nginx_vhost_domain}.conf" }
+end
+
+describe file("#{nginx_conf_dir}/conf.d/play-WAF-lbs-upstream.conf") do
+  it { should be_file }
+  it { should be_mode 644 }
+  it { should be_owned_by 'root' }
+end
+
+describe file("#{nginx_conf_dir}/conf.mail.d/play.#{nginx_vhost_domain}.conf") do
+  it { should be_file }
+  it { should be_mode 644 }
+  it { should be_owned_by 'root' }
+end
 
 #-----------------
 #  Service

@@ -4,5 +4,22 @@
   vars_files:
     - roles/ansible-nginx/test/integration/default/vars.yml
 
+  pre_tasks:
+    - name: Copy nginx ssl private key
+      copy: 
+        src: roles/ansible-nginx/test/ssl/server.key
+        dest: /etc/ssl/private/server.key
+
+    - name: Copy nginx wildcard ssl cert
+      copy: 
+        src: roles/ansible-nginx/test/ssl/server.crt
+        dest: /etc/ssl/certs/server.crt
+
+    - name: Copy nginx ssl private key
+      copy: 
+        src: roles/ansible-nginx/test/ssl/ca.crt
+        dest: /etc/ssl/certs/ca.crt
+
+
   roles:
     - ansible-nginx
