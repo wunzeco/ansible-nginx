@@ -13,7 +13,6 @@ nginx_global_owner:           'root'
 nginx_global_group:           "{{ nginx_root_group }}"
 nginx_global_mode:            '0644'
 nginx_http_access_log:        "{{ nginx_log_dir }}/access.log"
-nginx_manage_repo:            true
 nginx_nginx_error_log:        "{{ nginx_log_dir }}/error.log"
 nginx_root_group:             root
 nginx_proxy_temp_path:        "{{ nginx_run_dir }}/proxy_temp"
@@ -23,6 +22,9 @@ nginx_sites_available_mode:   '0644'
 nginx_super_user:             true
 nginx_confd_purge:            false
 nginx_vhost_purge:            false
+nginx_manage_repo:            true
+nginx_repo: 
+nginx_mainline_repo: 
 
 
 ### START Nginx Configuration ###
