@@ -21,8 +21,9 @@ galaxy_info:
         - raring
         - saucy
         - trusty
+        - xenial
   categories:
     - web
     - nginx
 dependencies: []
-  
+

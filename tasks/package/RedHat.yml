@@ -1,10 +1,34 @@
 ---
-- set_fact: _os=rhel
-  when: ansible_distribution|lower != 'centos'
+- set_fact:
+    nginx_yum_repo_os_distro: centos
+  when: ansible_distribution|lower == 'centos'
 
-- name: Configure nginx yum repo
-  template: src=nginx.yum.repo.j2 dest=/etc/yum.repos.d/nginx.repo
-  when: nginx_manage_repo
+- name: Set nginx yum repo baseurl | stable version
+  set_fact:
+    nginx_yum_repo_baseurl: "{{ nginx_mainline_yum_repo_baseurl }}"
+  when: nginx_package_source == 'nginx-mainline'
+
+- name: Add nginx yum repository config
+  yum_repository:
+    name: nginx
+    description: "Nginx Repository"
+    baseurl: "{{ nginx_yum_repo_baseurl }}"
+    gpgkey: "http://nginx.org/keys/nginx_signing.key"
+    gpgcheck: yes
+    enabled:  yes
+
+- name: Set nginx package name | no specific version
+  set_fact:
+    _nginx_package: "{{ nginx_package_name }}"
+  when: nginx_version == '*'
+
+- name: Set nginx package name | specific version set
+  set_fact:
+    _nginx_package: "{{ nginx_package_name }}-{{ nginx_version }}"
+  when: nginx_version != '*'
 
 - name: Install nginx package
-  yum: name={{ nginx_package_name }} update_cache=yes state=present
+  yum:
+    name: "{{ _nginx_package }}"
+    update_cache: yes
+    state: present
