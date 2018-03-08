@@ -36,9 +36,11 @@
     - ca-certificates
   when: nginx_manage_repo and nginx_package_source == 'passenger'
 
-- name: Install phusion passenger 
+- name: Install phusion passenger
   apt: name=passenger state=present
   when: nginx_manage_repo and nginx_package_source == 'passenger'
 
 - name: Install nginx package
-  apt: name={{ nginx_package_name }} state=present
+  apt:
+    name: "{{ nginx_package_name }}={{ nginx_version|default('*') }}"
+    state: present

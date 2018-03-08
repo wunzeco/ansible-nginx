@@ -1,2 +1,3 @@
 ---
 nginx_manage_repo: true
+nginx_daemon_user: 'nginx'
