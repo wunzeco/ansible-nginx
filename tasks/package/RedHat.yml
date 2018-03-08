@@ -17,18 +17,13 @@
     gpgcheck: yes
     enabled:  yes
 
-- name: Set nginx package name | no specific version
-  set_fact:
-    _nginx_package: "{{ nginx_package_name }}"
-  when: nginx_version == '*'
-
-- name: Set nginx package name | specific version set
+- name: Set nginx package name if version is set
   set_fact:
     _nginx_package: "{{ nginx_package_name }}-{{ nginx_version }}"
   when: nginx_version != '*'
 
 - name: Install nginx package
   yum:
-    name: "{{ _nginx_package }}"
+    name: "{{ _nginx_package|default(nginx_package_name) }}"
     update_cache: yes
     state: present
