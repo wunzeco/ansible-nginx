@@ -81,7 +81,7 @@ nginx_proxy_set_header:
   - 'X-Real-IP $remote_addr'
   - 'X-Forwarded-For $proxy_add_x_forwarded_for'
 nginx_sendfile:                       'on'
-nginx_server_tokens:                  'on'
+nginx_server_tokens:                  'off'
 nginx_spdy:                           'off'
 nginx_ssl_stapling:                   'off'
 nginx_types_hash_bucket_size:         '512'
