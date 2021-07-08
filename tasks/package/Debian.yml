@@ -12,11 +12,12 @@
 
 - name: Add nginx repo apt key
   apt_key: keyserver=keyserver.ubuntu.com id=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
-  when: nginx_manage_repo and nginx_package_source|match('nginx|nginx-stable|nginx-mainline')
+  when: nginx_manage_repo and nginx_package_source is match('nginx|nginx-stable|nginx-mainline')
+  
 
 - name: Add nginx repo to sources list
   apt_repository: repo="deb {{ nginx_repo }}" state=present
-  when: nginx_manage_repo and nginx_package_source|match('nginx|nginx-stable')
+  when: nginx_manage_repo and nginx_package_source is match('nginx|nginx-stable')
   register: default_repo
   notify: Update nginx apt cache
 
