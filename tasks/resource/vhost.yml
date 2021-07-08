@@ -10,7 +10,7 @@
 
 - name: Validate IPv6 kernel support exists if ipv6_enabled is true
   fail: msg="[nginx] IPv6 support is not enabled or configured properly"
-  when: item.ipv6_enable|default(false) and not ansible_default_ipv6.address 
+  when: item.ipv6_enable|default(false) and not ansible_default_ipv6.address
   with_items: "{{ nginx_vhost }}"
 
 - name: Validate SSL certificate/key is defined
@@ -20,7 +20,7 @@
 
 - name: Validate vhost name
   fail: msg="Cannot have whitespace, '/' or '_' characters in vhost name"
-  when: item.vhost|search(' |/|_')
+  when: item.vhost is search(' |/|_')
   with_items: "{{ nginx_vhost }}"
 
 - name: Validate use_default_location attribute for each vhost config object is defined
@@ -36,8 +36,8 @@
 - include: location.yml
   when: config_nginx_location
 
-- name: Create nginx non-ssl vhost header config fragment 
-  template: 
+- name: Create nginx non-ssl vhost header config fragment
+  template:
     src:    vhost/vhost_header.j2
     dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/001-nonssl-header.vhost"
     owner:  root
@@ -46,8 +46,8 @@
   when: not item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
-- name: Create nginx non-ssl vhost footer config fragment 
-  template: 
+- name: Create nginx non-ssl vhost footer config fragment
+  template:
     src:    vhost/vhost_footer.j2
     dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/699-nonssl-footer.vhost"
     owner:  root
@@ -56,7 +56,7 @@
   when: not item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
-- name: Create nginx ssl vhost header config fragment 
+- name: Create nginx ssl vhost header config fragment
   template:
     src:    vhost/vhost_ssl_header.j2
     dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/700-ssl-header.vhost"
@@ -66,7 +66,7 @@
   when: item.ssl|default(false)
   with_items: "{{ nginx_vhost }}"
 
-- name: Create nginx ssl vhost footer config fragment 
+- name: Create nginx ssl vhost footer config fragment
   template:
     src:    vhost/vhost_ssl_footer.j2
     dest:   "{{ _vhost_fragments_dir }}/{{ item.vhost }}/999-ssl-footer.vhost"
